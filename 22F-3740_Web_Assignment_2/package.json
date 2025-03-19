@@ -1,0 +1,31 @@
+{
+  "name": "22f-3740_web_assignment_2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Blasty11/22F-3740_Web_Assignment_2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Blasty11/22F-3740_Web_Assignment_2/issues"
+  },
+  "homepage": "https://github.com/Blasty11/22F-3740_Web_Assignment_2#readme",
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "mongoose": "^8.12.1",
+    "nodemon": "^3.1.9",
+    "socket.io": "^4.8.1"
+  }
+}
