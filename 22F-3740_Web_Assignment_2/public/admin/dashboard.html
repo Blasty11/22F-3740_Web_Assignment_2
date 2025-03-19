@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard - University Portal</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <h1>Admin Dashboard</h1>
+  <div style="text-align: center;">
+    <a href="/admin/logout">Logout</a>
+  </div>
+
+  <!-- Form to Add a New Course -->
+  <h2>Add New Course</h2>
+  <form id="admin-add-course-form">
+    <input type="text" id="admin-courseName" placeholder="Course Name" required>
+    <select id="admin-day" required>
+      <option value="">Select Day</option>
+      <option value="Monday">Monday</option>
+      <option value="Tuesday">Tuesday</option>
+      <option value="Wednesday">Wednesday</option>
+      <option value="Thursday">Thursday</option>
+      <option value="Friday">Friday</option>
+    </select>
+    <input type="time" id="admin-startTime" required>
+    <input type="time" id="admin-endTime" required>
+    <input type="number" id="admin-seatCount" placeholder="Seat Count" required>
+    <!-- For simplicity, prerequisites as comma-separated Course IDs -->
+    <input type="text" id="admin-prerequisites" placeholder="Prerequisites (IDs comma-separated)">
+    <button type="submit">Add Course</button>
+  </form>
+
+  <hr>
+
+  <!-- Course Management List -->
+  <h2>Manage Courses</h2>
+  <div id="admin-courses"></div>
+
+  <script>
+    async function fetchAdminCourses() {
+      const res = await fetch('/api/admin/courses');
+      const courses = await res.json();
+      const container = document.getElementById('admin-courses');
+      container.innerHTML = '';
+      courses.forEach(course => {
+        const div = document.createElement('div');
+        div.style.border = '1px solid #ccc';
+        div.style.padding = '10px';
+        div.style.marginBottom = '10px';
+        div.innerHTML = `
+          <strong>${course.courseName}</strong> (${course.day} ${course.startTime}-${course.endTime})<br>
+          Seats: ${course.seatCount}<br>
+          Prerequisites: ${course.prerequisites.map(pr => pr.courseName || pr).join(', ') || 'None'}<br>
+          <button onclick="deleteCourse('${course._id}')">Delete</button>
+          <button onclick="toggleUpdateForm('${course._id}')">Update</button>
+          <div id="update-form-${course._id}" style="display:none;">
+            <input type="text" id="update-courseName-${course._id}" placeholder="Course Name" value="${course.courseName}">
+            <input type="text" id="update-day-${course._id}" placeholder="Day" value="${course.day}">
+            <input type="time" id="update-startTime-${course._id}" value="${course.startTime}">
+            <input type="time" id="update-endTime-${course._id}" value="${course.endTime}">
+            <input type="number" id="update-seatCount-${course._id}" placeholder="Seat Count" value="${course.seatCount}">
+            <input type="text" id="update-prerequisites-${course._id}" placeholder="Prerequisites (IDs comma-separated)" value="${course.prerequisites.join(',')}">
+            <button onclick="updateCourse('${course._id}')">Submit Update</button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    document.getElementById('admin-add-course-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const courseName = document.getElementById('admin-courseName').value;
+      const day = document.getElementById('admin-day').value;
+      const startTime = document.getElementById('admin-startTime').value;
+      const endTime = document.getElementById('admin-endTime').value;
+      const seatCount = parseInt(document.getElementById('admin-seatCount').value);
+      const prerequisitesInput = document.getElementById('admin-prerequisites').value;
+      const prerequisites = prerequisitesInput ? prerequisitesInput.split(',').map(s => s.trim()) : [];
+      await fetch('/api/admin/courses', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ courseName, day, startTime, endTime, seatCount, prerequisites })
+      });
+      document.getElementById('admin-add-course-form').reset();
+      fetchAdminCourses();
+    });
+
+    async function deleteCourse(id) {
+      if (confirm('Delete this course?')) {
+        await fetch(`/api/admin/courses/${id}`, { method: 'DELETE' });
+        fetchAdminCourses();
+      }
+    }
+
+    function toggleUpdateForm(id) {
+      const formDiv = document.getElementById(`update-form-${id}`);
+      formDiv.style.display = formDiv.style.display === 'none' ? 'block' : 'none';
+    }
+
+    async function updateCourse(id) {
+      const courseName = document.getElementById(`update-courseName-${id}`).value;
+      const day = document.getElementById(`update-day-${id}`).value;
+      const startTime = document.getElementById(`update-startTime-${id}`).value;
+      const endTime = document.getElementById(`update-endTime-${id}`).value;
+      const seatCount = parseInt(document.getElementById(`update-seatCount-${id}`).value);
+      const prerequisitesInput = document.getElementById(`update-prerequisites-${id}`).value;
+      const prerequisites = prerequisitesInput ? prerequisitesInput.split(',').map(s => s.trim()) : [];
+      await fetch(`/api/admin/courses/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ courseName, day, startTime, endTime, seatCount, prerequisites })
+      });
+      fetchAdminCourses();
+    }
+
+    fetchAdminCourses();
+  </script>
+</body>
+</html>

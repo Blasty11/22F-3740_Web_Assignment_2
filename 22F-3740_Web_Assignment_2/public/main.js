@@ -22,7 +22,7 @@ function renderCalendarGrid() {
     timeCell.textContent = `${hour}:00`;
     row.appendChild(timeCell);
 
-    // Day cells
+    // Day cells for each day
     days.forEach(day => {
       const dayCell = document.createElement('div');
       dayCell.className = 'day-cell';
@@ -57,7 +57,7 @@ async function deleteCourse(id) {
   await fetch(`/api/courses/${id}`, { method: 'DELETE' });
 }
 
-// Check for conflicts among courses (for calendar display)
+// Check for scheduling conflicts (for calendar display)
 function detectConflicts(courses) {
   const conflicts = new Set();
   days.forEach(day => {
@@ -80,7 +80,7 @@ function detectConflicts(courses) {
   return conflicts;
 }
 
-// Utility: Convert "HH:MM" to minutes
+// Utility: Convert "HH:MM" to minutes since midnight
 function convertTimeToMinutes(timeStr) {
   const [hour, minute] = timeStr.split(':').map(Number);
   return hour * 60 + minute;
@@ -105,7 +105,7 @@ async function renderCourses() {
       if (cellHour === Math.floor(courseStart / 60)) {
         const courseDiv = document.createElement('div');
         courseDiv.className = 'course-event';
-        courseDiv.textContent = course.courseName + ` (${course.startTime}-${course.endTime})`;
+        courseDiv.textContent = `${course.courseName} (${course.startTime}-${course.endTime})`;
         if (conflictIds.has(course._id)) {
           courseDiv.classList.add('conflict');
         }
@@ -124,7 +124,6 @@ async function renderCourses() {
 }
 
 // --- Real-Time Conflict Check for New Course Form ---
-
 function checkNewCourseConflict() {
   const day = document.getElementById('day').value;
   const startTime = document.getElementById('startTime').value;
@@ -164,7 +163,7 @@ function checkNewCourseConflict() {
   });
 }
 
-// Helper function to check for conflict before submission
+// Helper to check for conflict before submission
 async function hasConflict(day, startTime, endTime) {
   const courses = await fetchCourses();
   const dayCourses = courses.filter(course => course.day === day);
@@ -211,6 +210,6 @@ form.addEventListener('submit', async (e) => {
   renderCourses();
 });
 
-// Initial rendering of the calendar and courses
+// Initial rendering
 renderCalendarGrid();
 renderCourses();
