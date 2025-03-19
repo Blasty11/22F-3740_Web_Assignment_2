@@ -49,10 +49,10 @@ function isAdminAuthenticated(req, res, next) {
   }
 }
 
-// --- Student Routes ---
-// Student Login Page
+// --- Landing & Student Routes ---
+// GET "/" - Serve landing page with two buttons
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+  res.sendFile(path.join(__dirname, 'public', 'landing.html'));
 });
 
 // Process Student Login
@@ -74,10 +74,15 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Student Logout
+// Student Logout (with proper callback)
 app.get('/logout', (req, res) => {
-  req.session.destroy();
-  res.redirect('/');
+  req.session.destroy(err => {
+    if (err) {
+      console.error('Logout error:', err);
+      return res.status(500).send("Error during logout");
+    }
+    res.redirect('/');
+  });
 });
 
 // Student Scheduling Page (protected)
@@ -142,10 +147,15 @@ app.post('/admin/login', async (req, res) => {
   }
 });
 
-// Admin Logout
+// Admin Logout (with proper callback)
 app.get('/admin/logout', (req, res) => {
-  req.session.destroy();
-  res.redirect('/admin/login');
+  req.session.destroy(err => {
+    if (err) {
+      console.error('Admin logout error:', err);
+      return res.status(500).send("Error during logout");
+    }
+    res.redirect('/');
+  });
 });
 
 // Admin Dashboard (protected)
@@ -154,7 +164,6 @@ app.get('/admin/dashboard', isAdminAuthenticated, (req, res) => {
 });
 
 // --- Admin API Endpoints ---
-// Get all courses (for management)
 app.get('/api/admin/courses', isAdminAuthenticated, async (req, res) => {
   try {
     const courses = await Course.find({}).populate('prerequisites');
@@ -164,7 +173,6 @@ app.get('/api/admin/courses', isAdminAuthenticated, async (req, res) => {
   }
 });
 
-// Add a new course (with prerequisites and seat count)
 app.post('/api/admin/courses', isAdminAuthenticated, async (req, res) => {
   try {
     const { courseName, day, startTime, endTime, prerequisites, seatCount } = req.body;
@@ -183,11 +191,10 @@ app.post('/api/admin/courses', isAdminAuthenticated, async (req, res) => {
   }
 });
 
-// Update an existing course (including prerequisites and seat management)
 app.put('/api/admin/courses/:id', isAdminAuthenticated, async (req, res) => {
   try {
     const { id } = req.params;
-    const updateData = req.body; // Expect keys: courseName, day, startTime, endTime, prerequisites, seatCount
+    const updateData = req.body;
     const updatedCourse = await Course.findByIdAndUpdate(id, updateData, { new: true });
     res.json(updatedCourse);
   } catch (err) {
@@ -195,7 +202,6 @@ app.put('/api/admin/courses/:id', isAdminAuthenticated, async (req, res) => {
   }
 });
 
-// Delete a course
 app.delete('/api/admin/courses/:id', isAdminAuthenticated, async (req, res) => {
   try {
     const { id } = req.params;
@@ -206,7 +212,6 @@ app.delete('/api/admin/courses/:id', isAdminAuthenticated, async (req, res) => {
   }
 });
 
-// Start the server
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
