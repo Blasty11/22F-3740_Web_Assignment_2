@@ -1,0 +1,193 @@
+/* styles.css */
+:root {
+    --primary: #6366f1;
+    --primary-hover: #4f46e5;
+    --secondary: #f472b6;
+    --background: #f8fafc;
+    --text: #0f172a;
+    --border: #e2e8f0;
+  }
+  
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    margin: 0;
+    padding: 2rem;
+    background: var(--background);
+    color: var(--text);
+    min-height: 100vh;
+    animation: fadeIn 0.5s ease-in;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  h1 {
+    text-align: center;
+    color: var(--primary);
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    position: relative;
+    padding-bottom: 0.5rem;
+  }
+  
+  h1::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    border-radius: 2px;
+  }
+  
+  form {
+    margin-bottom: 2rem;
+    text-align: center;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  input, select, button {
+    padding: 0.75rem 1.25rem;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  input:focus, select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  }
+  
+  button {
+    background: var(--primary);
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+  }
+  
+  button:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+  
+  .calendar {
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+    width: 95%;
+    max-width: 1200px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    background: white;
+    animation: slideUp 0.5s ease-out;
+  }
+  
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  
+  .calendar-header, .calendar-row {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    border-bottom: 1px solid var(--border);
+    transition: background 0.2s ease;
+  }
+  
+  .calendar-header > div {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    padding: 1rem;
+    text-align: center;
+    font-weight: 600;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .calendar-row:hover {
+    background: #f8fafc;
+  }
+  
+  .time-cell {
+    padding: 1rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .day-cell {
+    position: relative;
+    min-height: 80px;
+    padding: 0.5rem;
+    transition: background 0.2s ease;
+  }
+  
+  .day-cell:hover {
+    background: #f8fafc;
+  }
+  
+  .course-event {
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    padding: 8px;
+    background: linear-gradient(135deg, var(--primary), #818cf8);
+    color: white;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    animation: eventAppear 0.3s ease-out;
+  }
+  
+  @keyframes eventAppear {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  
+  .course-event:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+  
+  .course-event.conflict {
+    background: linear-gradient(135deg, #ef4444, #f87171);
+    animation: pulse 2s infinite;
+  }
+  
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+  }
+  
+  @media (max-width: 768px) {
+    body {
+      padding: 1rem;
+    }
+    
+    .calendar-header, .calendar-row {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .calendar-header > div:nth-child(n+4),
+    .calendar-row > div:nth-child(n+4) {
+      display: none;
+    }
+  }

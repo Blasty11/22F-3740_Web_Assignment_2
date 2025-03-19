@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Scheduling Nightmare</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h1>Scheduling Nightmare</h1>
+  <div style="text-align: center;">
+    <a href="/logout">Logout</a>
+  </div>
+  
+  <!-- Course Form -->
+  <form id="course-form">
+    <input type="text" id="courseName" placeholder="Course Name" required>
+    <select id="day" required>
+      <option value="">Select Day</option>
+      <option value="Monday">Monday</option>
+      <option value="Tuesday">Tuesday</option>
+      <option value="Wednesday">Wednesday</option>
+      <option value="Thursday">Thursday</option>
+      <option value="Friday">Friday</option>
+    </select>
+    <input type="time" id="startTime" required>
+    <input type="time" id="endTime" required>
+    <button type="submit">Add Course</button>
+  </form>
+
+  <!-- Real-time conflict warning -->
+  <div id="conflict-warning" style="color: red; display: none; text-align: center;"></div>
+
+  <!-- Calendar View -->
+  <div class="calendar">
+    <div class="calendar-header">
+      <div>Time</div>
+      <div>Monday</div>
+      <div>Tuesday</div>
+      <div>Wednesday</div>
+      <div>Thursday</div>
+      <div>Friday</div>
+    </div>
+    <div class="calendar-body" id="calendar-body"></div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

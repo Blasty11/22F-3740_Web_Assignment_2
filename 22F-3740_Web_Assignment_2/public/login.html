@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Login - Scheduling Nightmare</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h1>Student Login</h1>
+  <form id="login-form">
+    <input type="text" id="rollNumber" placeholder="Enter Roll Number" required>
+    <button type="submit">Login</button>
+  </form>
+  <div id="login-message" style="color: red; text-align: center;"></div>
+
+  <script>
+    const form = document.getElementById('login-form');
+    const messageDiv = document.getElementById('login-message');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const rollNumber = document.getElementById('rollNumber').value;
+      const res = await fetch('/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rollNumber })
+      });
+      const data = await res.json();
+      if (res.status === 200) {
+        window.location.href = '/schedule';
+      } else {
+        messageDiv.textContent = data.message || 'Login failed';
+      }
+    });
+  </script>
+</body>
+</html>
