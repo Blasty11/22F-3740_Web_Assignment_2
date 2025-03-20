@@ -1,81 +1,62 @@
-// main.js
-
-// active nav link
 document.addEventListener('DOMContentLoaded', () => {
   const navLinks = document.querySelectorAll('.nav-link');
   const sections = document.querySelectorAll('.section');
-  
+
   navLinks.forEach(link => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
-      // Remove 'active' class from all nav links
       navLinks.forEach(nav => nav.classList.remove('active'));
-      // Add 'active' to the clicked link
       link.classList.add('active');
-      
-      // Show/hide sections
+
       const target = link.getAttribute('href').substring(1);
       sections.forEach(section => {
         section.style.display = (section.id === target) ? 'block' : 'none';
       });
-    });
-  });
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-  // Navigation: Show/hide sections based on nav link clicked
-  const navLinks = document.querySelectorAll('.nav-link');
-  const sections = document.querySelectorAll('.section');
-
-  navLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
-      e.preventDefault();
-      const target = link.getAttribute('href').substring(1);
-      sections.forEach(section => {
-        section.style.display = (section.id === target) ? 'block' : 'none';
-      });
-      // When timetable section is shown, populate the update dropdown
       if (target === 'timetable-section') {
         populateUpdateCourseDropdown();
       }
     });
   });
 
-  // Initialize sections on page load
   loadRegistrationSection();
   populateDepartmentDropdown();
   renderCalendar();
+
+  fetchStudentProfile().then(student => {
+    if (student) {
+      document.getElementById('student-username').textContent = student.username;
+    }
+  });
 });
 
-// ===============================
-// Registration Section Code
-// ===============================
+async function fetchStudentProfile() {
+  const res = await fetch('/api/student/profile', { credentials: 'include' });
+  if (res.ok) {
+    return await res.json();
+  } else {
+    return null;
+  }
+}
 
-// Fetch all courses (for registration and search)
 async function fetchCourses() {
-  const res = await fetch('/api/courses');
+  const res = await fetch('/api/courses', { credentials: 'include' });
   return await res.json();
 }
 
-// Fetch the student's registered courses
 async function fetchStudentCourses() {
-  const res = await fetch('/api/student/courses');
+  const res = await fetch('/api/student/courses', { credentials: 'include' });
   return await res.json();
 }
 
-// Populate the Available and Registered Courses divisions
 async function loadRegistrationSection() {
-  // Fetch all courses and registered courses
   const allCourses = await fetchCourses();
   const registeredCourses = await fetchStudentCourses();
   const registeredIds = registeredCourses.map(course => course._id.toString());
 
-  // Populate Available Courses (only courses not registered)
   const availableCoursesDiv = document.getElementById('available-courses');
   availableCoursesDiv.innerHTML = '<h3>Available Courses</h3>';
   allCourses.forEach(course => {
     if (!registeredIds.includes(course._id.toString())) {
-      // Create a container div
       const containerDiv = document.createElement('div');
       containerDiv.style.display = 'flex';
       containerDiv.style.justifyContent = 'space-between';
@@ -85,17 +66,16 @@ async function loadRegistrationSection() {
       containerDiv.style.border = '1px solid #ccc';
       containerDiv.style.borderRadius = '4px';
 
-      // Text span for course details
       const textSpan = document.createElement('span');
       textSpan.textContent = `${course.courseName} - Seats: ${course.seatCount} - Dept: ${course.department || 'N/A'}`;
 
-      // Register button
       const registerBtn = document.createElement('button');
       registerBtn.textContent = 'Register Course';
       registerBtn.style.marginLeft = '10px';
       registerBtn.addEventListener('click', async () => {
         const res = await fetch('/api/register-course', {
           method: 'POST',
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ courseId: course._id })
         });
@@ -114,14 +94,12 @@ async function loadRegistrationSection() {
     }
   });
 
-  // Populate Registered Courses
   const registeredCoursesDiv = document.getElementById('registered-courses');
   registeredCoursesDiv.innerHTML = '<h3>Registered Courses</h3>';
   if (registeredCourses.length === 0) {
     registeredCoursesDiv.innerHTML += '<p>No courses registered.</p>';
   } else {
     registeredCourses.forEach(course => {
-      // Create a container div
       const containerDiv = document.createElement('div');
       containerDiv.style.display = 'flex';
       containerDiv.style.justifyContent = 'space-between';
@@ -130,14 +108,11 @@ async function loadRegistrationSection() {
       containerDiv.style.padding = '8px';
       containerDiv.style.border = '1px solid #ccc';
       containerDiv.style.borderRadius = '4px';
-      // Highlight registered courses in green
       containerDiv.style.backgroundColor = 'lightgreen';
 
-      // Text span for course details
       const textSpan = document.createElement('span');
       textSpan.textContent = `${course.courseName} - Seats: ${course.seatCount} - Dept: ${course.department || 'N/A'}`;
 
-      // Drop button
       const dropBtn = document.createElement('button');
       dropBtn.textContent = 'Drop Course';
       dropBtn.style.marginLeft = '10px';
@@ -145,6 +120,7 @@ async function loadRegistrationSection() {
         if (confirm('Are you sure you want to drop this course?')) {
           const res = await fetch('/api/unregister-course', {
             method: 'DELETE',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ courseId: course._id })
           });
@@ -165,16 +141,11 @@ async function loadRegistrationSection() {
   }
 }
 
-// ===============================
-// Search Section Code
-// ===============================
-
 async function populateDepartmentDropdown() {
   try {
-    const res = await fetch('/api/departments');
+    const res = await fetch('/api/departments', { credentials: 'include' });
     const departments = await res.json();
     const deptSelect = document.getElementById('search-department');
-    // "All Departments" option should already be in HTML
     departments.forEach(dept => {
       if (!dept || dept.trim() === '') return;
       const option = document.createElement('option');
@@ -224,10 +195,6 @@ document.getElementById('search-btn').addEventListener('click', async () => {
   });
 });
 
-// ===============================
-// Timetable Section Code
-// ===============================
-
 const startHour = 8;
 const endHour = 18;
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
@@ -256,11 +223,11 @@ async function renderCalendar() {
       courseDiv.style.height = height + 'px';
       courseDiv.style.width = '100%';
 
-      // Drop course on click
       courseDiv.addEventListener('click', async () => {
         if (confirm('Do you want to drop this course?')) {
           const res = await fetch('/api/unregister-course', {
             method: 'DELETE',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ courseId: course._id })
           });
@@ -327,17 +294,13 @@ function detectConflicts(courses) {
   return conflicts;
 }
 
-// ===============================
-// Update Timetable Form Code
-// ===============================
-
 async function populateUpdateCourseDropdown() {
   const courses = await fetchStudentCourses();
   const courseDropdown = document.getElementById('update-courseName');
   courseDropdown.innerHTML = '<option value="">Select a registered course</option>';
   courses.forEach(course => {
     const option = document.createElement('option');
-    option.value = course._id; // Use course ID for reliable update
+    option.value = course._id;
     option.textContent = course.courseName;
     courseDropdown.appendChild(option);
   });
@@ -355,7 +318,6 @@ document.getElementById('update-timetable-form').addEventListener('submit', asyn
     return;
   }
 
-  // Conflict Check: Fetch student's registered courses and exclude the course being updated
   const courses = await fetchStudentCourses();
   const courseToUpdate = courses.find(c => c._id.toString() === courseId);
   if (!courseToUpdate) {
@@ -379,6 +341,7 @@ document.getElementById('update-timetable-form').addEventListener('submit', asyn
 
   const res = await fetch('/api/student/update-timetable', {
     method: 'POST',
+    credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ courseId, startTime, endTime, day })
   });

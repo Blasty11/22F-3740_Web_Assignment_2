@@ -1,241 +1,237 @@
-/* styles.css */
 :root {
-    --primary: #6366f1;
-    --primary-hover: #4f46e5;
-    --secondary: #f472b6;
-    --background: #f8fafc;
-    --text: #0f172a;
-    --border: #e2e8f0;
-  }
-  
+  --primary: #6366f1;
+  --primary-hover: #4f46e5;
+  --secondary: #f472b6;
+  --background: #f8fafc;
+  --text: #0f172a;
+  --border: #e2e8f0;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  margin: 0;
+  padding: 2rem;
+  background: var(--background);
+  color: var(--text);
+  min-height: 100vh;
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+h1 {
+  text-align: center;
+  color: var(--primary);
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+h1::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  border-radius: 2px;
+}
+
+form {
+  margin-bottom: 2rem;
+  text-align: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+input, select, button {
+  padding: 0.75rem 1.25rem;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+button {
+  background: var(--primary);
+  color: white;
+  border: none;
+  cursor: pointer;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+}
+
+button:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.calendar {
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  width: 95%;
+  max-width: 1200px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  background: white;
+  animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.calendar-header, .calendar-row {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s ease;
+}
+
+.calendar-header > div {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  padding: 1rem;
+  text-align: center;
+  font-weight: 600;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.calendar-row:hover {
+  background: #f8fafc;
+}
+
+.time-cell {
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.day-cell {
+  position: relative;
+  min-height: 80px;
+  padding: 0.5rem;
+  transition: background 0.2s ease;
+}
+
+.day-cell:hover {
+  background: #f8fafc;
+}
+
+.course-event {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  padding: 8px;
+  background: linear-gradient(135deg, var(--primary), #818cf8);
+  color: white;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  animation: eventAppear 0.3s ease-out;
+}
+
+@keyframes eventAppear {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.course-event:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.course-event.conflict {
+  background: linear-gradient(135deg, #ef4444, #f87171);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+@media (max-width: 768px) {
   body {
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    margin: 0;
-    padding: 2rem;
-    background: var(--background);
-    color: var(--text);
-    min-height: 100vh;
-    animation: fadeIn 0.5s ease-in;
-  }
-  
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-  
-  h1 {
-    text-align: center;
-    color: var(--primary);
-    font-size: 2.5rem;
-    margin-bottom: 2rem;
-    position: relative;
-    padding-bottom: 0.5rem;
-  }
-  
-  h1::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100px;
-    height: 3px;
-    background: linear-gradient(90deg, var(--primary), var(--secondary));
-    border-radius: 2px;
-  }
-  
-  form {
-    margin-bottom: 2rem;
-    text-align: center;
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-  
-  input, select, button {
-    padding: 0.75rem 1.25rem;
-    border: 2px solid var(--border);
-    border-radius: 8px;
-    font-size: 1rem;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  input:focus, select:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-  }
-  
-  button {
-    background: var(--primary);
-    color: white;
-    border: none;
-    cursor: pointer;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-  }
-  
-  button:hover {
-    background: var(--primary-hover);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  }
-  
-  .calendar {
-    display: flex;
-    flex-direction: column;
-    margin: 0 auto;
-    width: 95%;
-    max-width: 1200px;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    background: white;
-    animation: slideUp 0.5s ease-out;
-  }
-  
-  @keyframes slideUp {
-    from { transform: translateY(20px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+    padding: 1rem;
   }
   
   .calendar-header, .calendar-row {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    border-bottom: 1px solid var(--border);
-    transition: background 0.2s ease;
+    grid-template-columns: repeat(3, 1fr);
   }
   
-  .calendar-header > div {
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    padding: 1rem;
-    text-align: center;
-    font-weight: 600;
-    color: white;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+  .calendar-header > div:nth-child(n+4),
+  .calendar-row > div:nth-child(n+4) {
+    display: none;
   }
-  
-  .calendar-row:hover {
-    background: #f8fafc;
-  }
-  
-  .time-cell {
-    padding: 1rem;
-    text-align: center;
-    font-size: 0.9rem;
-    color: #64748b;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .day-cell {
-    position: relative;
-    min-height: 80px;
-    padding: 0.5rem;
-    transition: background 0.2s ease;
-  }
-  
-  .day-cell:hover {
-    background: #f8fafc;
-  }
-  
-  .course-event {
-    position: absolute;
-    left: 4px;
-    right: 4px;
-    padding: 8px;
-    background: linear-gradient(135deg, var(--primary), #818cf8);
-    color: white;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    animation: eventAppear 0.3s ease-out;
-  }
-  
-  @keyframes eventAppear {
-    from { transform: scale(0.9); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-  }
-  
-  .course-event:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  }
-  
-  .course-event.conflict {
-    background: linear-gradient(135deg, #ef4444, #f87171);
-    animation: pulse 2s infinite;
-  }
-  
-  @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.02); }
-    100% { transform: scale(1); }
-  }
-  
-  @media (max-width: 768px) {
-    body {
-      padding: 1rem;
-    }
-    
-    .calendar-header, .calendar-row {
-      grid-template-columns: repeat(3, 1fr);
-    }
-    
-    .calendar-header > div:nth-child(n+4),
-    .calendar-row > div:nth-child(n+4) {
-      display: none;
-    }
-  }
+}
+.logout-button {
+  position: fixed;
+  top: 1.5rem;
+  right: 2rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--primary);
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: none;
+  cursor: pointer;
+  z-index: 1000;
+}
 
-  .logout-button {
-    position: fixed;
-    top: 1.5rem;
-    right: 2rem;
-    padding: 0.75rem 1.5rem;
-    background: var(--primary);
-    color: white;
-    text-decoration: none;
-    border-radius: 8px;
-    font-weight: 500;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border: none;
-    cursor: pointer;
-    z-index: 1000;
-  }
-  
-  .logout-button:hover {
-    background: var(--primary-hover);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-                0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  }
-  
-  .logout-button:active {
-    transform: translateY(0);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
-  
-  .logout-button::before {
-    content: "→";
-    display: inline-block;
-    transform: rotate(180deg);
-    transition: transform 0.2s ease;
-  }
-  
-  .logout-button:hover::before {
-    transform: rotate(180deg) translateX(2px);
-  }
+.logout-button:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+              0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
 
-  /* styles.css */
+.logout-button:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.logout-button::before {
+  content: "→";
+  display: inline-block;
+  transform: rotate(180deg);
+  transition: transform 0.2s ease;
+}
+
+.logout-button:hover::before {
+  transform: rotate(180deg) translateX(2px);
+}
+
 .main-nav {
   position: fixed;
   top: 0;
@@ -249,17 +245,53 @@
   gap: 2rem;
 }
 
+.nav-container {
+  background: #ffffff;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  margin-bottom: 2rem;
+}
+
 .nav-link {
   text-decoration: none;
-  color: var(--text);
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  transition: all 0.2s ease;
+  padding: 12px 24px;
+  margin-right: 15px;
+  color: #2d3436;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-link::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: #5562ea;
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #5562ea;
+  background: rgba(85, 98, 234, 0.05);
+}
+
+.nav-link:hover::before {
+  transform: scaleX(1);
 }
 
 .nav-link.active {
-  background: var(--primary);
-  color: white;
+  background: linear-gradient(135deg, #5562ea 0%, #6b79ff 100%);
+  color: #fff;
+  border-radius: 8px;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(85, 98, 234, 0.3);
 }
 
 .page-section {
@@ -297,6 +329,64 @@
   margin: 0 auto;
 }
 
+.search-form {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 20px;
+}
+
+.search-form input,
+.search-form select,
+.search-form button {
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.search-form input:focus,
+.search-form select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+.search-form button {
+  background: var(--primary);
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.search-form button:hover {
+  background: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.search-results {
+  margin: 20px auto;
+  padding: 20px;
+  width: 80%;
+  max-width: 600px;
+  background: #fff;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: left;
+  opacity: 0;
+  animation: fadeIn 0.5s forwards;
+  transition: all 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 #search-input {
   width: 100%;
   padding: 1rem;
@@ -308,10 +398,6 @@
   margin: 2rem auto;
 }
 
-
-/* Add these styles to the existing styles.css */
-
-/* Registration Container */
 .registration-container {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -332,7 +418,6 @@
   }
 }
 
-/* Available Courses and Registered Courses Sections */
 #available-courses,
 #registered-courses {
   background: white;
@@ -379,7 +464,6 @@
   }
 }
 
-/* Course Lists */
 #available-courses h3,
 #registered-courses h3 {
   color: var(--primary);
@@ -388,7 +472,6 @@
   border-bottom: 2px solid var(--border);
 }
 
-/* Registration Form */
 #register-course-form {
   max-width: 600px;
   margin: 2rem auto;
@@ -410,7 +493,6 @@
   }
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .registration-container {
     grid-template-columns: 1fr;
@@ -423,14 +505,12 @@
   }
 }
 
-/* Add hover effect to course sections */
 #available-courses:hover h3,
 #registered-courses:hover h3 {
   color: var(--primary-hover);
   transition: color 0.3s ease;
 }
 
-/* Add subtle background pattern to sections */
 .section {
   position: relative;
   overflow: hidden;
@@ -450,4 +530,28 @@
   );
   z-index: -1;
   opacity: 0.3;
+}
+
+#student-username-display {
+  font-size: 1rem;
+  color: var(--text);
+  background: #ffffff;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  margin: 1rem auto;
+  display: inline-block;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.5s ease-in-out;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+#student-username-display:hover {
+  background: rgba(99, 102, 241, 0.05);
+  transform: translateY(-2px);
+}
+
+#student-username {
+  font-weight: bold;
+  color: var(--primary);
 }

@@ -7,7 +7,11 @@
 </head>
 <body>
   <header>
-    <h1>Scheduling Nightmare</h1>
+    <br>
+    <div class="header-left">
+      <h1>Scheduling Nightmare</h1>
+      <div id="student-username-display">Logged in as: <span id="student-username"></span></div>
+    </div>
     <nav class="main-nav">
       <a href="#register-section" class="nav-link active">Register Course</a>
       <a href="#search-section" class="nav-link">Search Courses</a>
@@ -17,51 +21,40 @@
   </header>
   
   <main>
-    <!-- Registration Section -->
     <section id="register-section" class="section">
       <h2>Course Registration</h2>
       <div class="registration-container">
-        <!-- Division for Available Courses with "Register Course" buttons -->
         <div id="available-courses">
           <h3>Available Courses</h3>
-          <!-- Dynamic content: Each available course is displayed with details and a "Register Course" button -->
         </div>
-        <!-- Division for Registered Courses with "Drop Course" buttons -->
         <div id="registered-courses">
           <h3>Registered Courses</h3>
-          <!-- Dynamic content: Each registered course is displayed with details and a "Drop Course" button -->
         </div>
       </div>
     </section>
     
-    <!-- Search Section -->
     <section id="search-section" class="section" style="display: none;">
       <h2>Search Courses</h2>
-      <input type="text" id="search-query" placeholder="Enter course name or department">
-      
-      <!-- Department dropdown (populated dynamically) -->
-      <select id="search-department">
-        <option value="All">All Departments</option>
-      </select>
-      
-      <!-- Seat availability dropdown -->
-      <select id="search-seats">
-        <option value="any">Any Seat Availability</option>
-        <option value="available">Only Courses With Seats</option>
-        <option value="full">Only Full Courses (0 Seats)</option>
-      </select>
-      
-      <button id="search-btn">Search</button>
-      <div id="search-results"></div>
+      <div class="search-form">
+        <input type="text" id="search-query" placeholder="Enter course name or department">
+        <select id="search-department">
+          <option value="All">All Departments</option>
+        </select>
+        <select id="search-seats">
+          <option value="any">Any Seat Availability</option>
+          <option value="available">Only Courses With Seats</option>
+          <option value="full">Only Full Courses (0 Seats)</option>
+        </select>
+        <button id="search-btn">Search</button>
+      </div>
+      <div id="search-results" class="search-results"></div>
     </section>
     
-    <!-- Timetable Section -->
+    
     <section id="timetable-section" class="section" style="display: none;">
-      <!-- Update Timetable Form --> 
       <h3>Update Timetable</h3>
       <form id="update-timetable-form">
         <label for="update-courseName">Course Name:</label>
-        <!-- Dropdown to be populated dynamically with student's registered courses only --> 
         <select id="update-courseName" name="courseName" required>
           <option value="">Select a registered course</option>
         </select>
@@ -85,7 +78,6 @@
       </form>
       
       <h2>Manage Timetable</h2>
-      <!-- Interactive Weekly Calendar --> 
       <div class="calendar">
         <div class="calendar-header">
           <div>Time</div>

@@ -5,36 +5,387 @@
   <title>Admin Dashboard - University Portal</title>
   <link rel="stylesheet" href="/styles.css">
   <style>
-    /* Basic styling for nav and sections */
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #f0f2f5;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .nav-container {
+      background: #ffffff;
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      margin-bottom: 2rem;
+    }
+
     .nav-link {
       text-decoration: none;
-      padding: 8px 16px;
-      margin-right: 10px;
-      color: #000;
+      padding: 12px 24px;
+      margin-right: 15px;
+      color: #2d3436;
+      font-weight: 500;
+      border-radius: 8px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
     }
+
+    .nav-link::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: #5562ea;
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+
+    .nav-link:hover {
+      color: #5562ea;
+      background: rgba(85, 98, 234, 0.05);
+    }
+
+    .nav-link:hover::before {
+      transform: scaleX(1);
+    }
+
     .nav-link.active {
-      background-color: #5562ea;
+      background: linear-gradient(135deg, #5562ea 0%, #6b79ff 100%);
       color: #fff;
-      border-radius: 4px;
+      border-radius: 8px;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(85, 98, 234, 0.3);
     }
+
     .section {
       margin: 20px;
+      animation: slideUp 0.6s ease-out forwards;
     }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     .student-item {
-      border: 1px solid #ccc;
-      padding: 8px;
-      margin: 5px 0;
+      background: #ffffff;
+      border: 1px solid #e0e4e7;
+      padding: 16px 24px;
+      margin: 10px 0;
+      border-radius: 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      transition: all 0.25s ease;
+      cursor: pointer;
     }
+
+    .student-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+      border-color: #5562ea;
+    }
+
     .student-buttons button {
-      margin-left: 5px;
+      margin-left: 12px;
+      padding: 8px 18px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .student-buttons button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .student-buttons button:first-child {
+      background: #5562ea;
+      color: white;
+    }
+
+    .student-buttons button:last-child {
+      background: #ff4757;
+      color: white;
+    }
+
+    .report-result {
+      margin: 2rem auto;
+      padding: 2.5rem;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      width: 85%;
+      max-width: 720px;
+      opacity: 0;
+      transform-origin: top center;
+      animation: reportEntrance 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .report-result::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 200%;
+      height: 100%;
+      background: linear-gradient(
+        45deg,
+        rgba(85, 98, 234, 0.05) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(85, 98, 234, 0.05) 50%,
+        rgba(85, 98, 234, 0.05) 75%,
+        transparent 75%,
+        transparent
+      );
+      background-size: 60px 60px;
+      transition: left 0.6s ease;
+      z-index: 0;
+    }
+
+    .report-result:hover {
+      transform: translateY(-5px) rotateX(2deg) rotateY(2deg);
+      box-shadow: 0 12px 40px rgba(85, 98, 234, 0.15),
+                  0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .report-result:hover::before {
+      left: 0;
+    }
+
+    .report-result:active {
+      transform: translateY(2px) scale(0.98);
+    }
+
+    @keyframes reportEntrance {
+      0% {
+        opacity: 0;
+        transform: translateY(50px) rotateX(-30deg) scale(0.9);
+      }
+      70% {
+        transform: translateY(-10px) rotateX(10deg) scale(1.02);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) rotateX(0) scale(1);
+      }
+    }
+
+    .report-header {
+      font-size: 1.8rem;
+      color: #2d3436;
+      margin-bottom: 1.5rem;
+      position: relative;
+      padding-bottom: 1rem;
+      animation: headerSlide 0.6s 0.3s ease-out forwards;
+      opacity: 0;
+    }
+
+    .report-header::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(90deg, #5562ea 0%, #6b79ff 100%);
+      border-radius: 2px;
+    }
+
+    @keyframes headerSlide {
+      from {
+        opacity: 0;
+        transform: translateX(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .report-content {
+      display: grid;
+      gap: 1.2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .report-item {
+      padding: 1rem;
+      background: rgba(245, 247, 250, 0.6);
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      animation: itemFadeIn 0.5s ease forwards;
+      opacity: 0;
+    }
+
+    .report-item:hover {
+      background: rgba(85, 98, 234, 0.08);
+      transform: translateX(10px);
+    }
+
+    @keyframes itemFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .progress-bar {
+      height: 12px;
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 6px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #5562ea 0%, #6b79ff 100%);
+      border-radius: 6px;
+      width: 0;
+      transition: width 1s ease-out;
+      position: relative;
+    }
+
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255, 255, 255, 0.3) 50%, 
+        transparent 100%
+      );
+      animation: shine 1.5s infinite;
+    }
+
+    @keyframes shine {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      animation: pulse 1.5s infinite alternate;
+    }
+
+    @keyframes pulse {
+      from { transform: scale(0.98); opacity: 0.8; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .report-icon {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .report-item:nth-child(1) { animation-delay: 0.2s; }
+    .report-item:nth-child(2) { animation-delay: 0.4s; }
+    .report-item:nth-child(3) { animation-delay: 0.6s; }
+
+    @media (max-width: 768px) {
+      .report-result {
+        width: 95%;
+        padding: 1.5rem;
+      }
+
+      .report-header {
+        font-size: 1.5rem;
+      }
+    }
+
+    :root {
+      --primary-color: #5562ea;
+      --secondary-color: #6b79ff;
+      --accent-color: #ff4757;
+    }
+
+    @keyframes cardEntrance {
+      from {
+        opacity: 0;
+        transform: translateY(40px) rotateX(15deg);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) rotateX(0);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .nav-container {
+        padding: 1rem;
+      }
+
+      .nav-link {
+        margin-right: 8px;
+        padding: 10px 16px;
+        font-size: 0.9rem;
+      }
+
+      .student-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .report-result {
+        width: 95%;
+        padding: 20px;
+      }
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.6; transform: scale(0.98); }
+      50% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0.6; transform: scale(0.98); }
+    }
+
+    .loading-item {
+      animation: pulse 1.8s infinite ease-in-out;
     }
   </style>
 </head>
 <body>
   <header>
+    <br><br>
     <h1>Admin Dashboard</h1>
     <nav class="main-nav">
       <a href="#report-section" class="nav-link active">Reports</a>
@@ -45,31 +396,29 @@
   </header>
 
   <main>
-    <!-- Reports Section -->
     <section id="report-section" class="section">
       <h2>Reports</h2>
-      <!-- Report 1: Students for a Specific Course -->
+
       <div style="margin-bottom: 20px;">
         <h3>List of Students for a Specific Course</h3>
         <input type="text" id="report-courseName" placeholder="Enter Course Name" />
         <button id="report-course-btn">Generate Report</button>
-        <div id="report-course-result" style="margin-top: 10px; border: 1px solid #ccc; padding: 10px;"></div>
+        <div id="report-course-result" class="report-result"></div>
       </div>
-      <!-- Report 2: Courses with Available Seats -->
+
       <div style="margin-bottom: 20px;">
         <h3>List of Courses with Available Seats</h3>
         <button id="report-available-courses-btn">Show Available Courses</button>
-        <div id="report-available-courses-result" style="margin-top: 10px; border: 1px solid #ccc; padding: 10px;"></div>
+        <div id="report-available-courses-result" class="report-result"></div>
       </div>
-      <!-- Report 3: Students Who Have Not Completed Prerequisites -->
+
       <div style="margin-bottom: 20px;">
         <h3>Students Not Completed Prerequisites</h3>
         <button id="report-prereq-btn">Generate Prerequisites Report</button>
-        <div id="report-prereq-result" style="margin-top: 10px; border: 1px solid #ccc; padding: 10px;"></div>
+        <div id="report-prereq-result" class="report-result"></div>
       </div>
     </section>
 
-    <!-- Student Management Section -->
     <section id="student-management-section" class="section" style="display: none;">
       <h2>Student Management</h2>
       <div>
@@ -78,11 +427,10 @@
         <button id="sm-search-btn">Search Student</button>
       </div>
       <div id="student-management-container" style="margin-top: 20px;">
-        <!-- Registered courses for the student will be displayed here -->
+
       </div>
     </section>
 
-    <!-- Add New Course Section -->
     <section id="add-course-section" class="section" style="display: none;">
       <h2>Add New Course</h2>
       <form id="admin-add-course-form" style="margin-bottom: 20px;">
@@ -99,7 +447,7 @@
   </main>
 
   <script>
-    // Navigation / Section Toggle
+
     document.addEventListener('DOMContentLoaded', () => {
       const navLinks = document.querySelectorAll('.nav-link');
       const sections = document.querySelectorAll('.section');
@@ -118,9 +466,6 @@
       fetchAdminCourses();
     });
 
-    // ------------------------------
-    // Admin Course Management
-    // ------------------------------
     async function fetchAdminCourses() {
       const res = await fetch('/api/admin/courses');
       const courses = await res.json();
@@ -143,7 +488,7 @@
             <input type="number" id="update-seatCount-${course._id}" placeholder="Seat Count" value="${course.seatCount}">
             <input type="text" id="update-department-${course._id}" placeholder="Department" value="${course.department || ''}">
             <input type="text" id="update-prerequisites-${course._id}" placeholder="Prerequisites (IDs comma-separated)" 
-                   value="${course.prerequisites.join(',')}">
+                    value="${course.prerequisites.join(',')}">
             <button onclick="updateCourse('${course._id}')">Submit Update</button>
           </div>
         `;
@@ -198,9 +543,6 @@
       fetchAdminCourses();
     }
 
-    // ------------------------------
-    // Reports Logic
-    // ------------------------------
     document.getElementById('report-course-btn').addEventListener('click', async () => {
       const courseName = document.getElementById('report-courseName').value.trim();
       const resultDiv = document.getElementById('report-course-result');
@@ -234,10 +576,6 @@
       }
     });
 
-    // ------------------------------
-    // Student Management Logic
-    // ------------------------------
-    // Allow admin to search by student roll number and show that student's registered courses.
     document.getElementById('sm-search-btn').addEventListener('click', async () => {
       const rollNumber = document.getElementById('sm-roll-number').value.trim();
       const container = document.getElementById('student-management-container');
@@ -260,7 +598,7 @@
             <strong>${course.courseName}</strong> - Dept: ${course.department || 'N/A'} - Seats: ${course.seatCount}<br>
             <button onclick="dropStudent('${data.studentId}', '${course._id}')">Drop Student</button>
           `;
-          // Only show prerequisites buttons if course has prerequisites
+
           if (course.prerequisites && course.prerequisites.length > 0) {
             const passBtn = document.createElement('button');
             passBtn.textContent = 'Pass Prereq';
@@ -300,9 +638,6 @@
       }
     });
 
-    // ------------------------------
-    // Update Timetable Form Code
-    // ------------------------------
     async function populateUpdateCourseDropdown() {
       const res = await fetch('/api/student/courses');
       const courses = await res.json();

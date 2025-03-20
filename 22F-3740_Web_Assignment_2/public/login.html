@@ -215,7 +215,6 @@
   <div id="login-message" style="color: red; text-align: center;"></div>
 
   <script>
-    // Create animated particles
     function createParticles() {
       const particles = document.getElementById('particles');
       for (let i = 0; i < 40; i++) {
@@ -229,7 +228,6 @@
       }
     }
 
-    // Handle form submission animation
     const form = document.getElementById('login-form');
     const messageDiv = document.getElementById('login-message');
 
@@ -259,10 +257,8 @@
       }
     });
 
-    // Initialize particles
     window.addEventListener('load', createParticles);
 
-    // Add shake animation for errors
     const shake = `
     @keyframes shake {
       0%, 100% { transform: translateX(0); }

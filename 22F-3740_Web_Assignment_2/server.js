@@ -18,7 +18,6 @@ const server = http.createServer(app);
 
 const PORT = 3000;
 
-// Connect to MongoDB
 mongoose.connect('mongodb://localhost:27017/university_db');
 mongoose.connection.once('open', () => {
   console.log('Connected to MongoDB');
@@ -70,6 +69,17 @@ app.post('/login', async (req, res) => {
       return res.status(200).json({ message: 'Login successful' });
     }
     return res.status(401).json({ message: 'Roll number not found' });
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+// New endpoint: Return logged-in student's profile
+app.get('/api/student/profile', isStudentAuthenticated, async (req, res) => {
+  try {
+    const student = await Student.findById(req.session.student._id).select('username rollNumber');
+    if (!student) return res.status(404).json({ message: 'Student not found' });
+    res.json(student);
   } catch (err) {
     res.status(500).send(err);
   }
@@ -231,8 +241,6 @@ app.post('/api/student/update-timetable', isStudentAuthenticated, async (req, re
 // =====================
 // ADMIN ENDPOINTS FOR STUDENT MANAGEMENT & PREREQUISITES
 // =====================
-
-// Get student courses by roll number (for Student Management page)
 app.get('/api/admin/student-courses', isAdminAuthenticated, async (req, res) => {
   try {
     const { rollNumber } = req.query;

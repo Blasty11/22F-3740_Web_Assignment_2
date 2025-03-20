@@ -156,7 +156,6 @@
   </style>
 </head>
 <body>
-  <!-- Animated background particles -->
   <div class="particles" id="particles"></div>
   
   <h1>Welcome to University Portal</h1>
@@ -166,7 +165,6 @@
   </div>
 
   <script>
-    // Create animated particles
     function createParticles() {
       const particles = document.getElementById('particles');
       for (let i = 0; i < 50; i++) {
@@ -180,7 +178,6 @@
       }
     }
     
-    // Create decorative circles
     function createDecorativeCircles() {
       for (let i = 0; i < 5; i++) {
         const circle = document.createElement('div');
@@ -194,7 +191,6 @@
       }
     }
 
-    // Initialize animations
     window.addEventListener('load', () => {
       createParticles();
       createDecorativeCircles();
