@@ -8,7 +8,7 @@
 <body>
   <h1>Admin Dashboard</h1>
   <div style="text-align: center;">
-    <a href="/admin/logout">Logout</a>
+    <a href="/admin/logout" class="logout-button">Logout</a>
   </div>
 
   <!-- Form to Add a New Course -->
@@ -26,6 +26,8 @@
     <input type="time" id="admin-startTime" required>
     <input type="time" id="admin-endTime" required>
     <input type="number" id="admin-seatCount" placeholder="Seat Count" required>
+    <!-- New department field -->
+    <input type="text" id="admin-department" placeholder="Department">
     <!-- For simplicity, prerequisites as comma-separated Course IDs -->
     <input type="text" id="admin-prerequisites" placeholder="Prerequisites (IDs comma-separated)">
     <button type="submit">Add Course</button>
@@ -50,17 +52,20 @@
         div.style.marginBottom = '10px';
         div.innerHTML = `
           <strong>${course.courseName}</strong> (${course.day} ${course.startTime}-${course.endTime})<br>
+          Department: ${course.department || 'N/A'}<br>
           Seats: ${course.seatCount}<br>
           Prerequisites: ${course.prerequisites.map(pr => pr.courseName || pr).join(', ') || 'None'}<br>
           <button onclick="deleteCourse('${course._id}')">Delete</button>
           <button onclick="toggleUpdateForm('${course._id}')">Update</button>
-          <div id="update-form-${course._id}" style="display:none;">
+          <div id="update-form-${course._id}" style="display:none; margin-top:10px;">
             <input type="text" id="update-courseName-${course._id}" placeholder="Course Name" value="${course.courseName}">
             <input type="text" id="update-day-${course._id}" placeholder="Day" value="${course.day}">
             <input type="time" id="update-startTime-${course._id}" value="${course.startTime}">
             <input type="time" id="update-endTime-${course._id}" value="${course.endTime}">
             <input type="number" id="update-seatCount-${course._id}" placeholder="Seat Count" value="${course.seatCount}">
-            <input type="text" id="update-prerequisites-${course._id}" placeholder="Prerequisites (IDs comma-separated)" value="${course.prerequisites.join(',')}">
+            <input type="text" id="update-department-${course._id}" placeholder="Department" value="${course.department || ''}">
+            <input type="text" id="update-prerequisites-${course._id}" placeholder="Prerequisites (IDs comma-separated)" 
+                   value="${course.prerequisites.join(',')}">
             <button onclick="updateCourse('${course._id}')">Submit Update</button>
           </div>
         `;
@@ -75,13 +80,25 @@
       const startTime = document.getElementById('admin-startTime').value;
       const endTime = document.getElementById('admin-endTime').value;
       const seatCount = parseInt(document.getElementById('admin-seatCount').value);
+      const department = document.getElementById('admin-department').value;
       const prerequisitesInput = document.getElementById('admin-prerequisites').value;
       const prerequisites = prerequisitesInput ? prerequisitesInput.split(',').map(s => s.trim()) : [];
+
+      // POST to /api/admin/courses with department included
       await fetch('/api/admin/courses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ courseName, day, startTime, endTime, seatCount, prerequisites })
+        body: JSON.stringify({ 
+          courseName, 
+          day, 
+          startTime, 
+          endTime, 
+          seatCount, 
+          prerequisites, 
+          department 
+        })
       });
+
       document.getElementById('admin-add-course-form').reset();
       fetchAdminCourses();
     });
@@ -104,16 +121,28 @@
       const startTime = document.getElementById(`update-startTime-${id}`).value;
       const endTime = document.getElementById(`update-endTime-${id}`).value;
       const seatCount = parseInt(document.getElementById(`update-seatCount-${id}`).value);
+      const department = document.getElementById(`update-department-${id}`).value;
       const prerequisitesInput = document.getElementById(`update-prerequisites-${id}`).value;
       const prerequisites = prerequisitesInput ? prerequisitesInput.split(',').map(s => s.trim()) : [];
+
+      // PUT to /api/admin/courses/:id with department included
       await fetch(`/api/admin/courses/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ courseName, day, startTime, endTime, seatCount, prerequisites })
+        body: JSON.stringify({ 
+          courseName, 
+          day, 
+          startTime, 
+          endTime, 
+          seatCount, 
+          prerequisites, 
+          department 
+        })
       });
       fetchAdminCourses();
     }
 
+    // Fetch courses on page load
     fetchAdminCourses();
   </script>
 </body>

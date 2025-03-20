@@ -6,43 +6,74 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>Scheduling Nightmare</h1>
-  <div style="text-align: center;">
-    <a href="/logout">Logout</a>
-  </div>
-  
-  <!-- Course Form -->
-  <form id="course-form">
-    <input type="text" id="courseName" placeholder="Course Name" required>
-    <select id="day" required>
-      <option value="">Select Day</option>
-      <option value="Monday">Monday</option>
-      <option value="Tuesday">Tuesday</option>
-      <option value="Wednesday">Wednesday</option>
-      <option value="Thursday">Thursday</option>
-      <option value="Friday">Friday</option>
-    </select>
-    <input type="time" id="startTime" required>
-    <input type="time" id="endTime" required>
-    <button type="submit">Add Course</button>
-  </form>
+  <header>
+    <h1>Scheduling Nightmare</h1>
+    <nav class="main-nav">
+      <a href="#register-section" class="nav-link active">Register Course</a>
+      <a href="#search-section" class="nav-link">Search Courses</a>
+      <a href="#timetable-section" class="nav-link">Manage Timetable</a>
+      <a href="/logout" class="logout-button">Logout</a>
+    </nav>
+    <div style="text-align: center;">
+      <a href="/admin/logout" class="logout-button">Logout</a>
 
-  <!-- Real-time conflict warning -->
-  <div id="conflict-warning" style="color: red; display: none; text-align: center;"></div>
-
-  <!-- Calendar View -->
-  <div class="calendar">
-    <div class="calendar-header">
-      <div>Time</div>
-      <div>Monday</div>
-      <div>Tuesday</div>
-      <div>Wednesday</div>
-      <div>Thursday</div>
-      <div>Friday</div>
     </div>
-    <div class="calendar-body" id="calendar-body"></div>
-  </div>
+  </header>
+  
+  <main>
+    <!-- Registration Section -->
+    <section id="register-section" class="section">
+      <h2>Course Registration</h2>
+      <!-- Display available courses with seat count and department -->
+      <div id="available-courses"></div>
+      <!-- Registration form with a dropdown list -->
+      <form id="register-course-form">
+        <label for="course-select">Select Course:</label>
+        <select id="course-select" required>
+          <option value="">Select a course</option>
+        </select>
+        <button type="submit">Register Course</button>
+      </form>
+    </section>
+    
+    <!-- Search Section -->
+    <section id="search-section" class="section" style="display: none;">
+      <h2>Search Courses</h2>
+      <input type="text" id="search-query" placeholder="Enter course name or department">
+      
+      <!-- Department dropdown (populated dynamically) -->
+      <select id="search-department">
+        <option value="All">All Departments</option>
+      </select>
 
+      <!-- Seat availability dropdown -->
+      <select id="search-seats">
+        <option value="any">Any Seat Availability</option>
+        <option value="available">Only Courses With Seats</option>
+        <option value="full">Only Full Courses (0 Seats)</option>
+      </select>
+
+      <button id="search-btn">Search</button>
+      <div id="search-results"></div>
+    </section>
+    
+    <!-- Timetable Section -->
+    <section id="timetable-section" class="section" style="display: none;">
+      <h2>Manage Timetable</h2>
+      <div class="calendar">
+        <div class="calendar-header">
+          <div>Time</div>
+          <div>Monday</div>
+          <div>Tuesday</div>
+          <div>Wednesday</div>
+          <div>Thursday</div>
+          <div>Friday</div>
+        </div>
+        <div class="calendar-body" id="calendar-body"></div>
+      </div>
+    </section>
+  </main>
+  
   <script src="main.js"></script>
 </body>
 </html>
