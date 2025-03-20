@@ -1,5 +1,27 @@
 // main.js
 
+// active nav link
+document.addEventListener('DOMContentLoaded', () => {
+  const navLinks = document.querySelectorAll('.nav-link');
+  const sections = document.querySelectorAll('.section');
+  
+  navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      // Remove 'active' class from all nav links
+      navLinks.forEach(nav => nav.classList.remove('active'));
+      // Add 'active' to the clicked link
+      link.classList.add('active');
+      
+      // Show/hide sections
+      const target = link.getAttribute('href').substring(1);
+      sections.forEach(section => {
+        section.style.display = (section.id === target) ? 'block' : 'none';
+      });
+    });
+  });
+});
+
 document.addEventListener('DOMContentLoaded', () => {
   // Navigation: Show/hide sections based on nav link clicked
   const navLinks = document.querySelectorAll('.nav-link');
@@ -10,12 +32,16 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       const target = link.getAttribute('href').substring(1);
       sections.forEach(section => {
-        section.style.display = section.id === target ? 'block' : 'none';
+        section.style.display = (section.id === target) ? 'block' : 'none';
       });
+      // When timetable section is shown, populate the update dropdown
+      if (target === 'timetable-section') {
+        populateUpdateCourseDropdown();
+      }
     });
   });
 
-  // Initialize sections
+  // Initialize sections on page load
   loadRegistrationSection();
   populateDepartmentDropdown();
   renderCalendar();
@@ -25,70 +51,130 @@ document.addEventListener('DOMContentLoaded', () => {
 // Registration Section Code
 // ===============================
 
-// Fetch courses from the server (expects courses to have fields: _id, courseName, seatCount, department, etc.)
+// Fetch all courses (for registration and search)
 async function fetchCourses() {
   const res = await fetch('/api/courses');
-  const courses = await res.json();
-  return courses;
+  return await res.json();
 }
 
-// Populate the course dropdown and available courses list for registration
+// Fetch the student's registered courses
+async function fetchStudentCourses() {
+  const res = await fetch('/api/student/courses');
+  return await res.json();
+}
+
+// Populate the Available and Registered Courses divisions
 async function loadRegistrationSection() {
-  const courses = await fetchCourses();
-  const courseSelect = document.getElementById('course-select');
+  // Fetch all courses and registered courses
+  const allCourses = await fetchCourses();
+  const registeredCourses = await fetchStudentCourses();
+  const registeredIds = registeredCourses.map(course => course._id.toString());
+
+  // Populate Available Courses (only courses not registered)
   const availableCoursesDiv = document.getElementById('available-courses');
-
-  // Clear current options and list
-  courseSelect.innerHTML = '<option value="">Select a course</option>';
   availableCoursesDiv.innerHTML = '<h3>Available Courses</h3>';
+  allCourses.forEach(course => {
+    if (!registeredIds.includes(course._id.toString())) {
+      // Create a container div
+      const containerDiv = document.createElement('div');
+      containerDiv.style.display = 'flex';
+      containerDiv.style.justifyContent = 'space-between';
+      containerDiv.style.alignItems = 'center';
+      containerDiv.style.margin = '5px 0';
+      containerDiv.style.padding = '8px';
+      containerDiv.style.border = '1px solid #ccc';
+      containerDiv.style.borderRadius = '4px';
 
-  courses.forEach(course => {
-    // Add option to dropdown
-    const option = document.createElement('option');
-    option.value = course._id;
-    option.textContent = `${course.courseName} - Seats: ${course.seatCount} - Dept: ${course.department || 'N/A'}`;
-    courseSelect.appendChild(option);
+      // Text span for course details
+      const textSpan = document.createElement('span');
+      textSpan.textContent = `${course.courseName} - Seats: ${course.seatCount} - Dept: ${course.department || 'N/A'}`;
 
-    // Display course details in the available courses list
-    const courseDiv = document.createElement('div');
-    courseDiv.textContent = `${course.courseName} - Seats: ${course.seatCount} - Dept: ${course.department || 'N/A'}`;
-    availableCoursesDiv.appendChild(courseDiv);
+      // Register button
+      const registerBtn = document.createElement('button');
+      registerBtn.textContent = 'Register Course';
+      registerBtn.style.marginLeft = '10px';
+      registerBtn.addEventListener('click', async () => {
+        const res = await fetch('/api/register-course', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ courseId: course._id })
+        });
+        if (res.ok) {
+          alert('Course registered successfully!');
+          loadRegistrationSection();
+          renderCalendar();
+        } else {
+          alert('Error registering course');
+        }
+      });
+
+      containerDiv.appendChild(textSpan);
+      containerDiv.appendChild(registerBtn);
+      availableCoursesDiv.appendChild(containerDiv);
+    }
   });
-}
 
-// Handle registration form submission
-document.getElementById('register-course-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const courseId = document.getElementById('course-select').value;
-  if (!courseId) {
-    alert('Please select a course');
-    return;
-  }
-  const res = await fetch('/api/register-course', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ courseId })
-  });
-  if (res.ok) {
-    alert('Course registered successfully!');
-    loadRegistrationSection(); // Refresh the list if needed
+  // Populate Registered Courses
+  const registeredCoursesDiv = document.getElementById('registered-courses');
+  registeredCoursesDiv.innerHTML = '<h3>Registered Courses</h3>';
+  if (registeredCourses.length === 0) {
+    registeredCoursesDiv.innerHTML += '<p>No courses registered.</p>';
   } else {
-    alert('Error registering course');
+    registeredCourses.forEach(course => {
+      // Create a container div
+      const containerDiv = document.createElement('div');
+      containerDiv.style.display = 'flex';
+      containerDiv.style.justifyContent = 'space-between';
+      containerDiv.style.alignItems = 'center';
+      containerDiv.style.margin = '5px 0';
+      containerDiv.style.padding = '8px';
+      containerDiv.style.border = '1px solid #ccc';
+      containerDiv.style.borderRadius = '4px';
+      // Highlight registered courses in green
+      containerDiv.style.backgroundColor = 'lightgreen';
+
+      // Text span for course details
+      const textSpan = document.createElement('span');
+      textSpan.textContent = `${course.courseName} - Seats: ${course.seatCount} - Dept: ${course.department || 'N/A'}`;
+
+      // Drop button
+      const dropBtn = document.createElement('button');
+      dropBtn.textContent = 'Drop Course';
+      dropBtn.style.marginLeft = '10px';
+      dropBtn.addEventListener('click', async () => {
+        if (confirm('Are you sure you want to drop this course?')) {
+          const res = await fetch('/api/unregister-course', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ courseId: course._id })
+          });
+          if (res.ok) {
+            alert('Course dropped successfully!');
+            loadRegistrationSection();
+            renderCalendar();
+          } else {
+            alert('Error dropping course');
+          }
+        }
+      });
+
+      containerDiv.appendChild(textSpan);
+      containerDiv.appendChild(dropBtn);
+      registeredCoursesDiv.appendChild(containerDiv);
+    });
   }
-});
+}
 
 // ===============================
 // Search Section Code
 // ===============================
 
-// Populate the department dropdown in the search section dynamically
 async function populateDepartmentDropdown() {
   try {
     const res = await fetch('/api/departments');
     const departments = await res.json();
-
     const deptSelect = document.getElementById('search-department');
-    // Already have default "All Departments" option in HTML
+    // "All Departments" option should already be in HTML
     departments.forEach(dept => {
       if (!dept || dept.trim() === '') return;
       const option = document.createElement('option');
@@ -101,48 +187,36 @@ async function populateDepartmentDropdown() {
   }
 }
 
-// Search button click handler
 document.getElementById('search-btn').addEventListener('click', async () => {
-  // Get user inputs
   const query = document.getElementById('search-query').value.toLowerCase().trim();
   const selectedDept = document.getElementById('search-department').value;
   const seatFilter = document.getElementById('search-seats').value;
 
-  // Fetch all courses
   const courses = await fetchCourses();
   const resultsDiv = document.getElementById('search-results');
   resultsDiv.innerHTML = '';
 
-  // 1) Filter by department (if not 'All')
   let filtered = courses;
   if (selectedDept !== 'All') {
-    filtered = filtered.filter(course => 
-      course.department && course.department === selectedDept
-    );
+    filtered = filtered.filter(course => course.department && course.department === selectedDept);
   }
-
-  // 2) Filter by text query (course name or department substring)
   if (query.length > 0) {
     filtered = filtered.filter(course => {
       const nameMatch = course.courseName.toLowerCase().includes(query);
       const deptMatch = course.department && course.department.toLowerCase().includes(query);
-      return (nameMatch || deptMatch);
+      return nameMatch || deptMatch;
     });
   }
-
-  // 3) Filter by seat availability
   if (seatFilter === 'available') {
     filtered = filtered.filter(course => course.seatCount > 0);
   } else if (seatFilter === 'full') {
     filtered = filtered.filter(course => course.seatCount === 0);
   }
 
-  // Display results
   if (filtered.length === 0) {
     resultsDiv.textContent = 'No courses found.';
     return;
   }
-
   filtered.forEach(course => {
     const div = document.createElement('div');
     div.textContent = `${course.courseName} - Dept: ${course.department || 'N/A'} - Seats: ${course.seatCount}`;
@@ -154,11 +228,57 @@ document.getElementById('search-btn').addEventListener('click', async () => {
 // Timetable Section Code
 // ===============================
 
-const startHour = 8; // 8 AM
-const endHour = 18;  // 6 PM
+const startHour = 8;
+const endHour = 18;
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
-// Render the empty calendar grid
+async function renderCalendar() {
+  renderCalendarGrid();
+  const courses = await fetchStudentCourses();
+  const conflictIds = detectConflicts(courses);
+
+  courses.forEach(course => {
+    const courseStart = convertTimeToMinutes(course.startTime);
+    const courseEnd = convertTimeToMinutes(course.endTime);
+    const slotDuration = 60;
+    const topOffset = ((courseStart - startHour * 60) / slotDuration) * 50;
+    const height = ((courseEnd - courseStart) / slotDuration) * 50 - 4;
+
+    const cellSelector = `.day-cell[data-day="${course.day}"][data-hour="${Math.floor(courseStart / 60)}"]`;
+    const dayCells = document.querySelectorAll(cellSelector);
+    dayCells.forEach(cell => {
+      const courseDiv = document.createElement('div');
+      courseDiv.className = 'course-event';
+      courseDiv.textContent = `${course.courseName} (${course.startTime}-${course.endTime})`;
+      if (conflictIds.has(course._id)) courseDiv.classList.add('conflict');
+      courseDiv.style.position = 'absolute';
+      courseDiv.style.top = (topOffset % 50) + 'px';
+      courseDiv.style.height = height + 'px';
+      courseDiv.style.width = '100%';
+
+      // Drop course on click
+      courseDiv.addEventListener('click', async () => {
+        if (confirm('Do you want to drop this course?')) {
+          const res = await fetch('/api/unregister-course', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ courseId: course._id })
+          });
+          if (res.ok) {
+            alert('Course dropped successfully!');
+            loadRegistrationSection();
+            renderCalendar();
+          } else {
+            alert('Error dropping course');
+          }
+        }
+      });
+      cell.style.position = 'relative';
+      cell.appendChild(courseDiv);
+    });
+  });
+}
+
 function renderCalendarGrid() {
   const calendarBody = document.getElementById('calendar-body');
   calendarBody.innerHTML = '';
@@ -166,13 +286,11 @@ function renderCalendarGrid() {
     const row = document.createElement('div');
     row.className = 'calendar-row';
 
-    // Time label cell
     const timeCell = document.createElement('div');
     timeCell.className = 'time-cell';
     timeCell.textContent = hour + ':00';
     row.appendChild(timeCell);
 
-    // Create day cells for each day
     days.forEach(day => {
       const dayCell = document.createElement('div');
       dayCell.className = 'day-cell';
@@ -180,70 +298,98 @@ function renderCalendarGrid() {
       dayCell.dataset.hour = hour;
       row.appendChild(dayCell);
     });
-
     calendarBody.appendChild(row);
   }
 }
 
-// Render the courses on the timetable calendar
-async function renderCalendar() {
-  renderCalendarGrid();
-  const courses = await fetchCourses();
-  const conflictIds = detectConflicts(courses);
-
-  courses.forEach(course => {
-    const courseStart = convertTimeToMinutes(course.startTime);
-    const courseEnd = convertTimeToMinutes(course.endTime);
-    const slotDuration = 60; // minutes
-    const topOffset = ((courseStart - startHour * 60) / slotDuration) * 50;
-    const height = ((courseEnd - courseStart) / slotDuration) * 50 - 4;
-
-    // Identify the correct cell based on course day and start time hour
-    const cellSelector = `.day-cell[data-day="${course.day}"][data-hour="${Math.floor(courseStart / 60)}"]`;
-    const dayCells = document.querySelectorAll(cellSelector);
-
-    dayCells.forEach(cell => {
-      const courseDiv = document.createElement('div');
-      courseDiv.className = 'course-event';
-      courseDiv.textContent = `${course.courseName} (${course.startTime}-${course.endTime})`;
-      if (conflictIds.has(course._id)) {
-        courseDiv.classList.add('conflict');
-      }
-      courseDiv.style.position = 'absolute';
-      courseDiv.style.top = (topOffset % 50) + 'px';
-      courseDiv.style.height = height + 'px';
-      courseDiv.style.width = '100%';
-      cell.style.position = 'relative';
-      cell.appendChild(courseDiv);
-    });
-  });
-}
-
-// Utility: Convert time string "HH:MM" to minutes since midnight
 function convertTimeToMinutes(timeStr) {
   const [hour, minute] = timeStr.split(':').map(Number);
   return hour * 60 + minute;
 }
 
-// Detect scheduling conflicts among courses (used for calendar display)
 function detectConflicts(courses) {
   const conflicts = new Set();
   days.forEach(day => {
     const dayCourses = courses.filter(course => course.day === day);
     for (let i = 0; i < dayCourses.length; i++) {
-      const a = dayCourses[i];
-      const aStart = convertTimeToMinutes(a.startTime);
-      const aEnd = convertTimeToMinutes(a.endTime);
+      const aStart = convertTimeToMinutes(dayCourses[i].startTime);
+      const aEnd = convertTimeToMinutes(dayCourses[i].endTime);
       for (let j = i + 1; j < dayCourses.length; j++) {
-        const b = dayCourses[j];
-        const bStart = convertTimeToMinutes(b.startTime);
-        const bEnd = convertTimeToMinutes(b.endTime);
+        const bStart = convertTimeToMinutes(dayCourses[j].startTime);
+        const bEnd = convertTimeToMinutes(dayCourses[j].endTime);
         if (aStart < bEnd && bStart < aEnd) {
-          conflicts.add(a._id);
-          conflicts.add(b._id);
+          conflicts.add(dayCourses[i]._id);
+          conflicts.add(dayCourses[j]._id);
         }
       }
     }
   });
   return conflicts;
 }
+
+// ===============================
+// Update Timetable Form Code
+// ===============================
+
+async function populateUpdateCourseDropdown() {
+  const courses = await fetchStudentCourses();
+  const courseDropdown = document.getElementById('update-courseName');
+  courseDropdown.innerHTML = '<option value="">Select a registered course</option>';
+  courses.forEach(course => {
+    const option = document.createElement('option');
+    option.value = course._id; // Use course ID for reliable update
+    option.textContent = course.courseName;
+    courseDropdown.appendChild(option);
+  });
+}
+
+document.getElementById('update-timetable-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const courseId = document.getElementById('update-courseName').value;
+  const startTime = document.getElementById('update-startTime').value;
+  const endTime = document.getElementById('update-endTime').value;
+  const day = document.getElementById('update-day').value;
+
+  if (!courseId || !startTime || !endTime || !day) {
+    alert('All fields are required.');
+    return;
+  }
+
+  // Conflict Check: Fetch student's registered courses and exclude the course being updated
+  const courses = await fetchStudentCourses();
+  const courseToUpdate = courses.find(c => c._id.toString() === courseId);
+  if (!courseToUpdate) {
+    alert('Course not registered.');
+    return;
+  }
+  const otherCourses = courses.filter(c => c._id.toString() !== courseId);
+  const updatedStart = convertTimeToMinutes(startTime);
+  const updatedEnd = convertTimeToMinutes(endTime);
+
+  for (const course of otherCourses) {
+    if (course.day === day) {
+      const otherStart = convertTimeToMinutes(course.startTime);
+      const otherEnd = convertTimeToMinutes(course.endTime);
+      if (updatedStart < otherEnd && otherStart < updatedEnd) {
+        alert('Conflict detected with another course. Timetable not updated.');
+        return;
+      }
+    }
+  }
+
+  const res = await fetch('/api/student/update-timetable', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ courseId, startTime, endTime, day })
+  });
+
+  const data = await res.json();
+  if (res.ok) {
+    alert(data.message);
+    document.getElementById('update-timetable-form').reset();
+    loadRegistrationSection();
+    renderCalendar();
+  } else {
+    alert(data.message || 'Error updating timetable');
+  }
+});

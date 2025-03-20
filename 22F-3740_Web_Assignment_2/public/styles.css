@@ -307,3 +307,147 @@
   max-width: 1200px;
   margin: 2rem auto;
 }
+
+
+/* Add these styles to the existing styles.css */
+
+/* Registration Container */
+.registration-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 2rem auto;
+  animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Available Courses and Registered Courses Sections */
+#available-courses,
+#registered-courses {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  min-height: 400px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#available-courses:hover,
+#registered-courses:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+#available-courses {
+  animation: slideFromLeft 0.5s ease-out;
+}
+
+#registered-courses {
+  animation: slideFromRight 0.5s ease-out;
+}
+
+@keyframes slideFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Course Lists */
+#available-courses h3,
+#registered-courses h3 {
+  color: var(--primary);
+  margin-top: 0;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border);
+}
+
+/* Registration Form */
+#register-course-form {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  animation: scaleUp 0.5s ease-out;
+}
+
+@keyframes scaleUp {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .registration-container {
+    grid-template-columns: 1fr;
+    padding: 0 1rem;
+  }
+
+  #register-course-form {
+    width: 90%;
+    padding: 1rem;
+  }
+}
+
+/* Add hover effect to course sections */
+#available-courses:hover h3,
+#registered-courses:hover h3 {
+  color: var(--primary-hover);
+  transition: color 0.3s ease;
+}
+
+/* Add subtle background pattern to sections */
+.section {
+  position: relative;
+  overflow: hidden;
+}
+
+.section::before {
+  content: '';
+  position: absolute;
+  width: 200%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(99, 102, 241, 0.05) 10px,
+    rgba(99, 102, 241, 0.05) 20px
+  );
+  z-index: -1;
+  opacity: 0.3;
+}

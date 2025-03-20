@@ -4,42 +4,123 @@
   <meta charset="UTF-8">
   <title>Admin Dashboard - University Portal</title>
   <link rel="stylesheet" href="/styles.css">
+  <style>
+    /* Basic styling for nav and sections */
+    .nav-link {
+      text-decoration: none;
+      padding: 8px 16px;
+      margin-right: 10px;
+      color: #000;
+    }
+    .nav-link.active {
+      background-color: #5562ea;
+      color: #fff;
+      border-radius: 4px;
+    }
+    .section {
+      margin: 20px;
+    }
+    .student-item {
+      border: 1px solid #ccc;
+      padding: 8px;
+      margin: 5px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .student-buttons button {
+      margin-left: 5px;
+    }
+  </style>
 </head>
 <body>
-  <h1>Admin Dashboard</h1>
-  <div style="text-align: center;">
-    <a href="/admin/logout" class="logout-button">Logout</a>
-  </div>
+  <header>
+    <h1>Admin Dashboard</h1>
+    <nav class="main-nav">
+      <a href="#report-section" class="nav-link active">Reports</a>
+      <a href="#student-management-section" class="nav-link">Student Management</a>
+      <a href="#add-course-section" class="nav-link">Add New Course</a>
+      <a href="/admin/logout" class="logout-button">Logout</a>
+    </nav>
+  </header>
 
-  <!-- Form to Add a New Course -->
-  <h2>Add New Course</h2>
-  <form id="admin-add-course-form">
-    <input type="text" id="admin-courseName" placeholder="Course Name" required>
-    <select id="admin-day" required>
-      <option value="">Select Day</option>
-      <option value="Monday">Monday</option>
-      <option value="Tuesday">Tuesday</option>
-      <option value="Wednesday">Wednesday</option>
-      <option value="Thursday">Thursday</option>
-      <option value="Friday">Friday</option>
-    </select>
-    <input type="time" id="admin-startTime" required>
-    <input type="time" id="admin-endTime" required>
-    <input type="number" id="admin-seatCount" placeholder="Seat Count" required>
-    <!-- New department field -->
-    <input type="text" id="admin-department" placeholder="Department">
-    <!-- For simplicity, prerequisites as comma-separated Course IDs -->
-    <input type="text" id="admin-prerequisites" placeholder="Prerequisites (IDs comma-separated)">
-    <button type="submit">Add Course</button>
-  </form>
+  <main>
+    <!-- Reports Section -->
+    <section id="report-section" class="section">
+      <h2>Reports</h2>
+      <!-- Report 1: Students for a Specific Course -->
+      <div style="margin-bottom: 20px;">
+        <h3>List of Students for a Specific Course</h3>
+        <input type="text" id="report-courseName" placeholder="Enter Course Name" />
+        <button id="report-course-btn">Generate Report</button>
+        <div id="report-course-result" style="margin-top: 10px; border: 1px solid #ccc; padding: 10px;"></div>
+      </div>
+      <!-- Report 2: Courses with Available Seats -->
+      <div style="margin-bottom: 20px;">
+        <h3>List of Courses with Available Seats</h3>
+        <button id="report-available-courses-btn">Show Available Courses</button>
+        <div id="report-available-courses-result" style="margin-top: 10px; border: 1px solid #ccc; padding: 10px;"></div>
+      </div>
+      <!-- Report 3: Students Who Have Not Completed Prerequisites -->
+      <div style="margin-bottom: 20px;">
+        <h3>Students Not Completed Prerequisites</h3>
+        <button id="report-prereq-btn">Generate Prerequisites Report</button>
+        <div id="report-prereq-result" style="margin-top: 10px; border: 1px solid #ccc; padding: 10px;"></div>
+      </div>
+    </section>
 
-  <hr>
+    <!-- Student Management Section -->
+    <section id="student-management-section" class="section" style="display: none;">
+      <h2>Student Management</h2>
+      <div>
+        <label for="sm-roll-number">Enter Student Roll Number:</label>
+        <input type="text" id="sm-roll-number" placeholder="Roll Number">
+        <button id="sm-search-btn">Search Student</button>
+      </div>
+      <div id="student-management-container" style="margin-top: 20px;">
+        <!-- Registered courses for the student will be displayed here -->
+      </div>
+    </section>
 
-  <!-- Course Management List -->
-  <h2>Manage Courses</h2>
-  <div id="admin-courses"></div>
+    <!-- Add New Course Section -->
+    <section id="add-course-section" class="section" style="display: none;">
+      <h2>Add New Course</h2>
+      <form id="admin-add-course-form" style="margin-bottom: 20px;">
+        <input type="text" id="admin-courseName" placeholder="Course Name" required>
+        <input type="number" id="admin-seatCount" placeholder="Seat Count" required>
+        <input type="text" id="admin-department" placeholder="Department">
+        <input type="text" id="admin-prerequisites" placeholder="Prerequisites (IDs comma-separated)">
+        <button type="submit">Add Course</button>
+      </form>
+      <hr>
+      <h2>Manage Courses</h2>
+      <div id="admin-courses"></div>
+    </section>
+  </main>
 
   <script>
+    // Navigation / Section Toggle
+    document.addEventListener('DOMContentLoaded', () => {
+      const navLinks = document.querySelectorAll('.nav-link');
+      const sections = document.querySelectorAll('.section');
+
+      navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          navLinks.forEach(nav => nav.classList.remove('active'));
+          link.classList.add('active');
+          const target = link.getAttribute('href').substring(1);
+          sections.forEach(section => {
+            section.style.display = (section.id === target) ? 'block' : 'none';
+          });
+        });
+      });
+      fetchAdminCourses();
+    });
+
+    // ------------------------------
+    // Admin Course Management
+    // ------------------------------
     async function fetchAdminCourses() {
       const res = await fetch('/api/admin/courses');
       const courses = await res.json();
@@ -51,7 +132,7 @@
         div.style.padding = '10px';
         div.style.marginBottom = '10px';
         div.innerHTML = `
-          <strong>${course.courseName}</strong> (${course.day} ${course.startTime}-${course.endTime})<br>
+          <strong>${course.courseName}</strong><br>
           Department: ${course.department || 'N/A'}<br>
           Seats: ${course.seatCount}<br>
           Prerequisites: ${course.prerequisites.map(pr => pr.courseName || pr).join(', ') || 'None'}<br>
@@ -59,9 +140,6 @@
           <button onclick="toggleUpdateForm('${course._id}')">Update</button>
           <div id="update-form-${course._id}" style="display:none; margin-top:10px;">
             <input type="text" id="update-courseName-${course._id}" placeholder="Course Name" value="${course.courseName}">
-            <input type="text" id="update-day-${course._id}" placeholder="Day" value="${course.day}">
-            <input type="time" id="update-startTime-${course._id}" value="${course.startTime}">
-            <input type="time" id="update-endTime-${course._id}" value="${course.endTime}">
             <input type="number" id="update-seatCount-${course._id}" placeholder="Seat Count" value="${course.seatCount}">
             <input type="text" id="update-department-${course._id}" placeholder="Department" value="${course.department || ''}">
             <input type="text" id="update-prerequisites-${course._id}" placeholder="Prerequisites (IDs comma-separated)" 
@@ -76,31 +154,22 @@
     document.getElementById('admin-add-course-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const courseName = document.getElementById('admin-courseName').value;
-      const day = document.getElementById('admin-day').value;
-      const startTime = document.getElementById('admin-startTime').value;
-      const endTime = document.getElementById('admin-endTime').value;
       const seatCount = parseInt(document.getElementById('admin-seatCount').value);
       const department = document.getElementById('admin-department').value;
       const prerequisitesInput = document.getElementById('admin-prerequisites').value;
       const prerequisites = prerequisitesInput ? prerequisitesInput.split(',').map(s => s.trim()) : [];
-
-      // POST to /api/admin/courses with department included
-      await fetch('/api/admin/courses', {
+      const res = await fetch('/api/admin/courses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          courseName, 
-          day, 
-          startTime, 
-          endTime, 
-          seatCount, 
-          prerequisites, 
-          department 
-        })
+        body: JSON.stringify({ courseName, seatCount, department, prerequisites })
       });
-
-      document.getElementById('admin-add-course-form').reset();
-      fetchAdminCourses();
+      if (res.ok) {
+        document.getElementById('admin-add-course-form').reset();
+        fetchAdminCourses();
+      } else {
+        const data = await res.json();
+        alert(data.message || 'Error adding course');
+      }
     });
 
     async function deleteCourse(id) {
@@ -112,38 +181,189 @@
 
     function toggleUpdateForm(id) {
       const formDiv = document.getElementById(`update-form-${id}`);
-      formDiv.style.display = formDiv.style.display === 'none' ? 'block' : 'none';
+      formDiv.style.display = (formDiv.style.display === 'none') ? 'block' : 'none';
     }
 
     async function updateCourse(id) {
       const courseName = document.getElementById(`update-courseName-${id}`).value;
-      const day = document.getElementById(`update-day-${id}`).value;
-      const startTime = document.getElementById(`update-startTime-${id}`).value;
-      const endTime = document.getElementById(`update-endTime-${id}`).value;
       const seatCount = parseInt(document.getElementById(`update-seatCount-${id}`).value);
       const department = document.getElementById(`update-department-${id}`).value;
       const prerequisitesInput = document.getElementById(`update-prerequisites-${id}`).value;
       const prerequisites = prerequisitesInput ? prerequisitesInput.split(',').map(s => s.trim()) : [];
-
-      // PUT to /api/admin/courses/:id with department included
       await fetch(`/api/admin/courses/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          courseName, 
-          day, 
-          startTime, 
-          endTime, 
-          seatCount, 
-          prerequisites, 
-          department 
-        })
+        body: JSON.stringify({ courseName, seatCount, department, prerequisites })
       });
       fetchAdminCourses();
     }
 
-    // Fetch courses on page load
-    fetchAdminCourses();
+    // ------------------------------
+    // Reports Logic
+    // ------------------------------
+    document.getElementById('report-course-btn').addEventListener('click', async () => {
+      const courseName = document.getElementById('report-courseName').value.trim();
+      const resultDiv = document.getElementById('report-course-result');
+      if (!courseName) {
+        resultDiv.textContent = 'Please enter a course name.';
+        return;
+      }
+      const res = await fetch(`/api/admin/reports/course-students?courseName=${encodeURIComponent(courseName)}`);
+      const data = await res.json();
+      if (!data.students || data.students.length === 0) {
+        resultDiv.textContent = 'No students found for this course.';
+      } else {
+        resultDiv.innerHTML = `<strong>Students Registered:</strong><br>`;
+        data.students.forEach(st => {
+          resultDiv.innerHTML += `Student ID: ${st.studentId}, RollNumber: ${st.rollNumber}<br>`;
+        });
+      }
+    });
+
+    document.getElementById('report-available-courses-btn').addEventListener('click', async () => {
+      const resultDiv = document.getElementById('report-available-courses-result');
+      const res = await fetch('/api/admin/reports/available-courses');
+      const data = await res.json();
+      if (!data || data.length === 0) {
+        resultDiv.textContent = 'No courses with available seats.';
+      } else {
+        resultDiv.innerHTML = `<strong>Courses With Available Seats:</strong><br>`;
+        data.forEach(course => {
+          resultDiv.innerHTML += `${course.courseName} - Dept: ${course.department || 'N/A'} - Seats: ${course.seatCount}<br>`;
+        });
+      }
+    });
+
+    // ------------------------------
+    // Student Management Logic
+    // ------------------------------
+    // Allow admin to search by student roll number and show that student's registered courses.
+    document.getElementById('sm-search-btn').addEventListener('click', async () => {
+      const rollNumber = document.getElementById('sm-roll-number').value.trim();
+      const container = document.getElementById('student-management-container');
+      container.innerHTML = '';
+      if (!rollNumber) {
+        container.textContent = 'Please enter a roll number.';
+        return;
+      }
+      const res = await fetch(`/api/admin/student-courses?rollNumber=${encodeURIComponent(rollNumber)}`);
+      const data = await res.json();
+      if (!data.courses || data.courses.length === 0) {
+        container.textContent = 'No registered courses found for this student.';
+      } else {
+        data.courses.forEach(course => {
+          const div = document.createElement('div');
+          div.style.border = '1px solid #ccc';
+          div.style.padding = '8px';
+          div.style.marginBottom = '5px';
+          div.innerHTML = `
+            <strong>${course.courseName}</strong> - Dept: ${course.department || 'N/A'} - Seats: ${course.seatCount}<br>
+            <button onclick="dropStudent('${data.studentId}', '${course._id}')">Drop Student</button>
+          `;
+          // Only show prerequisites buttons if course has prerequisites
+          if (course.prerequisites && course.prerequisites.length > 0) {
+            const passBtn = document.createElement('button');
+            passBtn.textContent = 'Pass Prereq';
+            passBtn.addEventListener('click', async () => {
+              const resStatus = await fetch('/api/admin/student-course/prerequisites', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ studentId: data.studentId, courseId: course._id, status: 'pass' })
+              });
+              if (resStatus.ok) {
+                alert('Prerequisite status set to PASS.');
+                document.getElementById('sm-search-btn').click();
+              } else {
+                alert('Error updating prerequisite status.');
+              }
+            });
+            div.appendChild(passBtn);
+            const failBtn = document.createElement('button');
+            failBtn.textContent = 'Fail Prereq';
+            failBtn.addEventListener('click', async () => {
+              const resStatus = await fetch('/api/admin/student-course/prerequisites', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ studentId: data.studentId, courseId: course._id, status: 'fail' })
+              });
+              if (resStatus.ok) {
+                alert('Prerequisite status set to FAIL.');
+                document.getElementById('sm-search-btn').click();
+              } else {
+                alert('Error updating prerequisite status.');
+              }
+            });
+            div.appendChild(failBtn);
+          }
+          container.appendChild(div);
+        });
+      }
+    });
+
+    // ------------------------------
+    // Update Timetable Form Code
+    // ------------------------------
+    async function populateUpdateCourseDropdown() {
+      const res = await fetch('/api/student/courses');
+      const courses = await res.json();
+      const courseDropdown = document.getElementById('update-courseName');
+      courseDropdown.innerHTML = '<option value="">Select a registered course</option>';
+      courses.forEach(course => {
+        const option = document.createElement('option');
+        option.value = course._id;
+        option.textContent = course.courseName;
+        courseDropdown.appendChild(option);
+      });
+    }
+
+    document.getElementById('update-timetable-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const courseId = document.getElementById('update-courseName').value;
+      const startTime = document.getElementById('update-startTime').value;
+      const endTime = document.getElementById('update-endTime').value;
+      const day = document.getElementById('update-day').value;
+      if (!courseId || !startTime || !endTime || !day) {
+        alert('All fields are required.');
+        return;
+      }
+      const courses = await fetchStudentCourses();
+      const courseToUpdate = courses.find(c => c._id.toString() === courseId);
+      if (!courseToUpdate) {
+        alert('Course not registered.');
+        return;
+      }
+      const otherCourses = courses.filter(c => c._id.toString() !== courseId);
+      const updatedStart = convertTimeToMinutes(startTime);
+      const updatedEnd = convertTimeToMinutes(endTime);
+      for (const course of otherCourses) {
+        if (course.day === day) {
+          const otherStart = convertTimeToMinutes(course.startTime);
+          const otherEnd = convertTimeToMinutes(course.endTime);
+          if (updatedStart < otherEnd && otherStart < updatedEnd) {
+            alert('Conflict detected with another course. Timetable not updated.');
+            return;
+          }
+        }
+      }
+      const resUpdate = await fetch('/api/student/update-timetable', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ courseId, startTime, endTime, day })
+      });
+      const data = await resUpdate.json();
+      if (resUpdate.ok) {
+        alert(data.message);
+        document.getElementById('update-timetable-form').reset();
+        loadRegistrationSection();
+      } else {
+        alert(data.message || 'Error updating timetable');
+      }
+    });
+
+    function convertTimeToMinutes(timeStr) {
+      const [hour, minute] = timeStr.split(':').map(Number);
+      return hour * 60 + minute;
+    }
   </script>
 </body>
 </html>
