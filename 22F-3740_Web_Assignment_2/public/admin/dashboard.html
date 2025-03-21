@@ -5,22 +5,19 @@
   <title>Admin Dashboard - University Portal</title>
   <link rel="stylesheet" href="/styles.css">
   <style>
-
     body {
       font-family: 'Segoe UI', system-ui, sans-serif;
       background: #f0f2f5;
       margin: 0;
       padding: 20px;
     }
-
     .nav-container {
       background: #ffffff;
       padding: 1rem 2rem;
       border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
       margin-bottom: 2rem;
     }
-
     .nav-link {
       text-decoration: none;
       padding: 12px 24px;
@@ -28,358 +25,35 @@
       color: #2d3436;
       font-weight: 500;
       border-radius: 8px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.3s;
       position: relative;
       overflow: hidden;
     }
-
-    .nav-link::before {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 3px;
-      background: #5562ea;
-      transform: scaleX(0);
-      transition: transform 0.3s ease;
-    }
-
     .nav-link:hover {
       color: #5562ea;
-      background: rgba(85, 98, 234, 0.05);
+      background: rgba(85, 98, 234,0.05);
     }
-
-    .nav-link:hover::before {
-      transform: scaleX(1);
-    }
-
     .nav-link.active {
       background: linear-gradient(135deg, #5562ea 0%, #6b79ff 100%);
       color: #fff;
       border-radius: 8px;
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(85, 98, 234, 0.3);
+      box-shadow: 0 4px 12px rgba(85,98,234,0.3);
     }
-
     .section {
       margin: 20px;
-      animation: slideUp 0.6s ease-out forwards;
     }
-
-    @keyframes slideUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
     }
-
-    .student-item {
-      background: #ffffff;
-      border: 1px solid #e0e4e7;
-      padding: 16px 24px;
-      margin: 10px 0;
-      border-radius: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: all 0.25s ease;
-      cursor: pointer;
+    table, th, td {
+      border: 1px solid #ccc;
     }
-
-    .student-item:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-      border-color: #5562ea;
-    }
-
-    .student-buttons button {
-      margin-left: 12px;
-      padding: 8px 18px;
-      border: none;
-      border-radius: 6px;
-      font-weight: 500;
-      transition: all 0.2s ease;
-      cursor: pointer;
-    }
-
-    .student-buttons button:hover {
-      transform: scale(1.05);
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .student-buttons button:first-child {
-      background: #5562ea;
-      color: white;
-    }
-
-    .student-buttons button:last-child {
-      background: #ff4757;
-      color: white;
-    }
-
-    .report-result {
-      margin: 2rem auto;
-      padding: 2.5rem;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(12px);
-      border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-      width: 85%;
-      max-width: 720px;
-      opacity: 0;
-      transform-origin: top center;
-      animation: reportEntrance 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
-      transition: all 0.4s ease;
-      position: relative;
-      overflow: hidden;
-      cursor: pointer;
-    }
-
-    .report-result::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 200%;
-      height: 100%;
-      background: linear-gradient(
-        45deg,
-        rgba(85, 98, 234, 0.05) 25%,
-        transparent 25%,
-        transparent 50%,
-        rgba(85, 98, 234, 0.05) 50%,
-        rgba(85, 98, 234, 0.05) 75%,
-        transparent 75%,
-        transparent
-      );
-      background-size: 60px 60px;
-      transition: left 0.6s ease;
-      z-index: 0;
-    }
-
-    .report-result:hover {
-      transform: translateY(-5px) rotateX(2deg) rotateY(2deg);
-      box-shadow: 0 12px 40px rgba(85, 98, 234, 0.15),
-                  0 8px 20px rgba(0, 0, 0, 0.08);
-    }
-
-    .report-result:hover::before {
-      left: 0;
-    }
-
-    .report-result:active {
-      transform: translateY(2px) scale(0.98);
-    }
-
-    @keyframes reportEntrance {
-      0% {
-        opacity: 0;
-        transform: translateY(50px) rotateX(-30deg) scale(0.9);
-      }
-      70% {
-        transform: translateY(-10px) rotateX(10deg) scale(1.02);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0) rotateX(0) scale(1);
-      }
-    }
-
-    .report-header {
-      font-size: 1.8rem;
-      color: #2d3436;
-      margin-bottom: 1.5rem;
-      position: relative;
-      padding-bottom: 1rem;
-      animation: headerSlide 0.6s 0.3s ease-out forwards;
-      opacity: 0;
-    }
-
-    .report-header::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 60px;
-      height: 3px;
-      background: linear-gradient(90deg, #5562ea 0%, #6b79ff 100%);
-      border-radius: 2px;
-    }
-
-    @keyframes headerSlide {
-      from {
-        opacity: 0;
-        transform: translateX(-30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-
-    .report-content {
-      display: grid;
-      gap: 1.2rem;
-      position: relative;
-      z-index: 1;
-    }
-
-    .report-item {
-      padding: 1rem;
-      background: rgba(245, 247, 250, 0.6);
-      border-radius: 12px;
-      transition: all 0.3s ease;
-      animation: itemFadeIn 0.5s ease forwards;
-      opacity: 0;
-    }
-
-    .report-item:hover {
-      background: rgba(85, 98, 234, 0.08);
-      transform: translateX(10px);
-    }
-
-    @keyframes itemFadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .progress-bar {
-      height: 12px;
-      background: rgba(0, 0, 0, 0.1);
-      border-radius: 6px;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #5562ea 0%, #6b79ff 100%);
-      border-radius: 6px;
-      width: 0;
-      transition: width 1s ease-out;
-      position: relative;
-    }
-
-    .progress-fill::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(90deg, 
-        transparent 0%, 
-        rgba(255, 255, 255, 0.3) 50%, 
-        transparent 100%
-      );
-      animation: shine 1.5s infinite;
-    }
-
-    @keyframes shine {
-      0% { transform: translateX(-100%); }
-      100% { transform: translateX(100%); }
-    }
-
-    .status-indicator {
-      display: inline-flex;
-      align-items: center;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 0.9rem;
-      animation: pulse 1.5s infinite alternate;
-    }
-
-    @keyframes pulse {
-      from { transform: scale(0.98); opacity: 0.8; }
-      to { transform: scale(1); opacity: 1; }
-    }
-
-    .report-icon {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-      animation: float 3s ease-in-out infinite;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-    }
-
-    .report-item:nth-child(1) { animation-delay: 0.2s; }
-    .report-item:nth-child(2) { animation-delay: 0.4s; }
-    .report-item:nth-child(3) { animation-delay: 0.6s; }
-
-    @media (max-width: 768px) {
-      .report-result {
-        width: 95%;
-        padding: 1.5rem;
-      }
-
-      .report-header {
-        font-size: 1.5rem;
-      }
-    }
-
-    :root {
-      --primary-color: #5562ea;
-      --secondary-color: #6b79ff;
-      --accent-color: #ff4757;
-    }
-
-    @keyframes cardEntrance {
-      from {
-        opacity: 0;
-        transform: translateY(40px) rotateX(15deg);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0) rotateX(0);
-      }
-    }
-
-    @media (max-width: 768px) {
-      .nav-container {
-        padding: 1rem;
-      }
-
-      .nav-link {
-        margin-right: 8px;
-        padding: 10px 16px;
-        font-size: 0.9rem;
-      }
-
-      .student-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-      }
-
-      .report-result {
-        width: 95%;
-        padding: 20px;
-      }
-    }
-
-    @keyframes pulse {
-      0% { opacity: 0.6; transform: scale(0.98); }
-      50% { opacity: 1; transform: scale(1); }
-      100% { opacity: 0.6; transform: scale(0.98); }
-    }
-
-    .loading-item {
-      animation: pulse 1.8s infinite ease-in-out;
+    th, td {
+      padding: 8px;
+      text-align: left;
     }
   </style>
 </head>
@@ -394,64 +68,57 @@
       <a href="/admin/logout" class="logout-button">Logout</a>
     </nav>
   </header>
-
   <main>
     <section id="report-section" class="section">
       <h2>Reports</h2>
-
-      <div style="margin-bottom: 20px;">
+      <div style="margin-bottom:20px;">
         <h3>List of Students for a Specific Course</h3>
-        <input type="text" id="report-courseName" placeholder="Enter Course Name" />
+        <input type="text" id="report-courseName" placeholder="Enter Course Name">
         <button id="report-course-btn">Generate Report</button>
-        <div id="report-course-result" class="report-result"></div>
+        <div id="report-course-result"></div>
       </div>
-
-      <div style="margin-bottom: 20px;">
+      <div style="margin-bottom:20px;">
         <h3>List of Courses with Available Seats</h3>
         <button id="report-available-courses-btn">Show Available Courses</button>
-        <div id="report-available-courses-result" class="report-result"></div>
+        <div id="report-available-courses-result"></div>
       </div>
 
-      <div style="margin-bottom: 20px;">
+      <div style="margin-bottom:20px;">
         <h3>Students Not Completed Prerequisites</h3>
         <button id="report-prereq-btn">Generate Prerequisites Report</button>
-        <div id="report-prereq-result" class="report-result"></div>
+        <div id="report-prereq-result"></div>
       </div>
     </section>
 
-    <section id="student-management-section" class="section" style="display: none;">
+    <section id="student-management-section" class="section" style="display:none;">
       <h2>Student Management</h2>
       <div>
         <label for="sm-roll-number">Enter Student Roll Number:</label>
         <input type="text" id="sm-roll-number" placeholder="Roll Number">
         <button id="sm-search-btn">Search Student</button>
       </div>
-      <div id="student-management-container" style="margin-top: 20px;">
-
-      </div>
+      <div id="student-management-container" style="margin-top:20px;"></div>
     </section>
 
-    <section id="add-course-section" class="section" style="display: none;">
+    <section id="add-course-section" class="section" style="display:none;">
       <h2>Add New Course</h2>
-      <form id="admin-add-course-form" style="margin-bottom: 20px;">
+      <form id="admin-add-course-form" style="margin-bottom:20px;">
+        <input type="text" id="admin-courseCode" placeholder="Course Code (e.g., CS1001)" required>
         <input type="text" id="admin-courseName" placeholder="Course Name" required>
         <input type="number" id="admin-seatCount" placeholder="Seat Count" required>
         <input type="text" id="admin-department" placeholder="Department">
-        <input type="text" id="admin-prerequisites" placeholder="Prerequisites (IDs comma-separated)">
+        <input type="text" id="admin-prerequisites" placeholder="Prerequisites (Names comma-separated)">
         <button type="submit">Add Course</button>
       </form>
-      <hr>
-      <h2>Manage Courses</h2>
+
+      <h3>Manage Courses</h3>
       <div id="admin-courses"></div>
     </section>
   </main>
-
   <script>
-
     document.addEventListener('DOMContentLoaded', () => {
       const navLinks = document.querySelectorAll('.nav-link');
       const sections = document.querySelectorAll('.section');
-
       navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
           e.preventDefault();
@@ -466,47 +133,70 @@
       fetchAdminCourses();
     });
 
+
     async function fetchAdminCourses() {
       const res = await fetch('/api/admin/courses');
       const courses = await res.json();
       const container = document.getElementById('admin-courses');
       container.innerHTML = '';
+      if (courses.length === 0) {
+        container.textContent = 'No courses available.';
+        return;
+      }
+      const table = document.createElement('table');
+      table.innerHTML = `
+        <thead>
+          <tr>
+            <th>Course Code</th>
+            <th>Course Name</th>
+            <th>Department</th>
+            <th>Total Seats</th>
+            <th>Enrolled</th>
+            <th>Available</th>
+            <th>Prerequisites</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+      `;
+      const tbody = document.createElement('tbody');
       courses.forEach(course => {
-        const div = document.createElement('div');
-        div.style.border = '1px solid #ccc';
-        div.style.padding = '10px';
-        div.style.marginBottom = '10px';
-        div.innerHTML = `
-          <strong>${course.courseName}</strong><br>
-          Department: ${course.department || 'N/A'}<br>
-          Seats: ${course.seatCount}<br>
-          Prerequisites: ${course.prerequisites.map(pr => pr.courseName || pr).join(', ') || 'None'}<br>
-          <button onclick="deleteCourse('${course._id}')">Delete</button>
-          <button onclick="toggleUpdateForm('${course._id}')">Update</button>
-          <div id="update-form-${course._id}" style="display:none; margin-top:10px;">
-            <input type="text" id="update-courseName-${course._id}" placeholder="Course Name" value="${course.courseName}">
-            <input type="number" id="update-seatCount-${course._id}" placeholder="Seat Count" value="${course.seatCount}">
-            <input type="text" id="update-department-${course._id}" placeholder="Department" value="${course.department || ''}">
-            <input type="text" id="update-prerequisites-${course._id}" placeholder="Prerequisites (IDs comma-separated)" 
-                    value="${course.prerequisites.join(',')}">
-            <button onclick="updateCourse('${course._id}')">Submit Update</button>
-          </div>
+        const prereqNames = course.prerequisites && course.prerequisites.length
+          ? course.prerequisites.map(pr => pr.courseName).join(', ')
+          : 'None';
+        const enrolled = course.enrolledCount || 0;
+        const available = course.seatCount - enrolled;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${course.courseCode}</td>
+          <td>${course.courseName}</td>
+          <td>${course.department || 'N/A'}</td>
+          <td>${course.seatCount}</td>
+          <td>${enrolled}</td>
+          <td>${available}</td>
+          <td>${prereqNames}</td>
+          <td>
+            <button onclick="deleteCourse('${course._id}')">Delete</button>
+            <button onclick="toggleUpdateForm('${course._id}')">Update</button>
+          </td>
         `;
-        container.appendChild(div);
+        tbody.appendChild(tr);
       });
+      table.appendChild(tbody);
+      container.appendChild(table);
     }
 
     document.getElementById('admin-add-course-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const courseName = document.getElementById('admin-courseName').value;
+      const courseCode = document.getElementById('admin-courseCode').value.trim();
+      const courseName = document.getElementById('admin-courseName').value.trim();
       const seatCount = parseInt(document.getElementById('admin-seatCount').value);
-      const department = document.getElementById('admin-department').value;
+      const department = document.getElementById('admin-department').value.trim();
       const prerequisitesInput = document.getElementById('admin-prerequisites').value;
       const prerequisites = prerequisitesInput ? prerequisitesInput.split(',').map(s => s.trim()) : [];
       const res = await fetch('/api/admin/courses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ courseName, seatCount, department, prerequisites })
+        body: JSON.stringify({ courseCode, courseName, seatCount, department, prerequisites })
       });
       if (res.ok) {
         document.getElementById('admin-add-course-form').reset();
@@ -518,27 +208,27 @@
     });
 
     async function deleteCourse(id) {
-      if (confirm('Delete this course?')) {
-        await fetch(`/api/admin/courses/${id}`, { method: 'DELETE' });
-        fetchAdminCourses();
-      }
+      if (!confirm('Delete this course?')) return;
+      await fetch(`/api/admin/courses/${id}`, { method: 'DELETE' });
+      fetchAdminCourses();
     }
 
     function toggleUpdateForm(id) {
-      const formDiv = document.getElementById(`update-form-${id}`);
-      formDiv.style.display = (formDiv.style.display === 'none') ? 'block' : 'none';
+      const newCourseName = prompt('Enter new course name:');
+      if (!newCourseName) return;
+      const newSeatCount = prompt('Enter new seat count:');
+      if (!newSeatCount) return;
+      const newDepartment = prompt('Enter new department:');
+      const newPrerequisites = prompt('Enter new prerequisites (Names comma-separated):', '');
+      const courseCode = prompt('Enter new course code:');
+      updateCourse(id, { courseCode, courseName: newCourseName, seatCount: parseInt(newSeatCount), department: newDepartment, prerequisites: newPrerequisites ? newPrerequisites.split(',').map(s => s.trim()) : [] });
     }
 
-    async function updateCourse(id) {
-      const courseName = document.getElementById(`update-courseName-${id}`).value;
-      const seatCount = parseInt(document.getElementById(`update-seatCount-${id}`).value);
-      const department = document.getElementById(`update-department-${id}`).value;
-      const prerequisitesInput = document.getElementById(`update-prerequisites-${id}`).value;
-      const prerequisites = prerequisitesInput ? prerequisitesInput.split(',').map(s => s.trim()) : [];
+    async function updateCourse(id, data) {
       await fetch(`/api/admin/courses/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ courseName, seatCount, department, prerequisites })
+        body: JSON.stringify(data)
       });
       fetchAdminCourses();
     }
@@ -546,6 +236,7 @@
     document.getElementById('report-course-btn').addEventListener('click', async () => {
       const courseName = document.getElementById('report-courseName').value.trim();
       const resultDiv = document.getElementById('report-course-result');
+      resultDiv.innerHTML = '';
       if (!courseName) {
         resultDiv.textContent = 'Please enter a course name.';
         return;
@@ -555,24 +246,92 @@
       if (!data.students || data.students.length === 0) {
         resultDiv.textContent = 'No students found for this course.';
       } else {
-        resultDiv.innerHTML = `<strong>Students Registered:</strong><br>`;
+        const table = document.createElement('table');
+        table.innerHTML = `
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Roll Number</th>
+            </tr>
+          </thead>
+        `;
+        const tbody = document.createElement('tbody');
         data.students.forEach(st => {
-          resultDiv.innerHTML += `Student ID: ${st.studentId}, RollNumber: ${st.rollNumber}<br>`;
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${st.username}</td><td>${st.rollNumber}</td>`;
+          tbody.appendChild(tr);
         });
+        table.appendChild(tbody);
+        resultDiv.appendChild(table);
       }
     });
 
     document.getElementById('report-available-courses-btn').addEventListener('click', async () => {
       const resultDiv = document.getElementById('report-available-courses-result');
+      resultDiv.innerHTML = '';
       const res = await fetch('/api/admin/reports/available-courses');
       const data = await res.json();
       if (!data || data.length === 0) {
         resultDiv.textContent = 'No courses with available seats.';
       } else {
-        resultDiv.innerHTML = `<strong>Courses With Available Seats:</strong><br>`;
+        const table = document.createElement('table');
+        table.innerHTML = `
+          <thead>
+            <tr>
+              <th>Course Code</th>
+              <th>Course Name</th>
+              <th>Department</th>
+              <th>Total Seats</th>
+              <th>Enrolled</th>
+              <th>Available</th>
+            </tr>
+          </thead>
+        `;
+        const tbody = document.createElement('tbody');
         data.forEach(course => {
-          resultDiv.innerHTML += `${course.courseName} - Dept: ${course.department || 'N/A'} - Seats: ${course.seatCount}<br>`;
+          const enrolled = course.enrolledCount || 0;
+          const available = course.seatCount - enrolled;
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${course.courseCode}</td>
+            <td>${course.courseName}</td>
+            <td>${course.department || 'N/A'}</td>
+            <td>${course.seatCount}</td>
+            <td>${enrolled}</td>
+            <td>${available}</td>
+          `;
+          tbody.appendChild(tr);
         });
+        table.appendChild(tbody);
+        resultDiv.appendChild(table);
+      }
+    });
+
+    document.getElementById('report-prereq-btn').addEventListener('click', async () => {
+      const resultDiv = document.getElementById('report-prereq-result');
+      resultDiv.innerHTML = '';
+      const res = await fetch('/api/admin/reports/prerequisites-not-completed');
+      const data = await res.json();
+      if (!data.students || data.students.length === 0) {
+        resultDiv.textContent = 'No students found with incomplete prerequisites.';
+      } else {
+        const table = document.createElement('table');
+        table.innerHTML = `
+          <thead>
+            <tr>
+              <th>Roll Number</th>
+              <th>Incomplete Prereq Count</th>
+            </tr>
+          </thead>
+        `;
+        const tbody = document.createElement('tbody');
+        data.students.forEach(st => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${st.rollNumber}</td><td>${st.notPassed.length}</td>`;
+          tbody.appendChild(tr);
+        });
+        table.appendChild(tbody);
+        resultDiv.appendChild(table);
       }
     });
 
@@ -589,115 +348,92 @@
       if (!data.courses || data.courses.length === 0) {
         container.textContent = 'No registered courses found for this student.';
       } else {
+        const table = document.createElement('table');
+        table.innerHTML = `
+          <thead>
+            <tr>
+              <th>Course Code</th>
+              <th>Course Name</th>
+              <th>Department</th>
+              <th>Total Seats</th>
+              <th>Enrolled</th>
+              <th>Available</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+        `;
+        const tbody = document.createElement('tbody');
         data.courses.forEach(course => {
-          const div = document.createElement('div');
-          div.style.border = '1px solid #ccc';
-          div.style.padding = '8px';
-          div.style.marginBottom = '5px';
-          div.innerHTML = `
-            <strong>${course.courseName}</strong> - Dept: ${course.department || 'N/A'} - Seats: ${course.seatCount}<br>
-            <button onclick="dropStudent('${data.studentId}', '${course._id}')">Drop Student</button>
+          const enrolled = course.enrolledCount || 0;
+          const available = course.seatCount - enrolled;
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${course.courseCode}</td>
+            <td>${course.courseName}</td>
+            <td>${course.department || 'N/A'}</td>
+            <td>${course.seatCount}</td>
+            <td>${enrolled}</td>
+            <td>${available}</td>
+            <td>
+              <button onclick="dropStudent('${data.studentId}', '${course._id}')">Drop</button>
+              ${
+                course.prerequisites && course.prerequisites.length > 0
+                  ? `
+                    <button onclick="passPrereq('${data.studentId}', '${course._id}')">Pass Prereq</button>
+                    <button onclick="failPrereq('${data.studentId}', '${course._id}')">Fail Prereq</button>
+                    `
+                  : ''
+              }
+            </td>
           `;
-
-          if (course.prerequisites && course.prerequisites.length > 0) {
-            const passBtn = document.createElement('button');
-            passBtn.textContent = 'Pass Prereq';
-            passBtn.addEventListener('click', async () => {
-              const resStatus = await fetch('/api/admin/student-course/prerequisites', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ studentId: data.studentId, courseId: course._id, status: 'pass' })
-              });
-              if (resStatus.ok) {
-                alert('Prerequisite status set to PASS.');
-                document.getElementById('sm-search-btn').click();
-              } else {
-                alert('Error updating prerequisite status.');
-              }
-            });
-            div.appendChild(passBtn);
-            const failBtn = document.createElement('button');
-            failBtn.textContent = 'Fail Prereq';
-            failBtn.addEventListener('click', async () => {
-              const resStatus = await fetch('/api/admin/student-course/prerequisites', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ studentId: data.studentId, courseId: course._id, status: 'fail' })
-              });
-              if (resStatus.ok) {
-                alert('Prerequisite status set to FAIL.');
-                document.getElementById('sm-search-btn').click();
-              } else {
-                alert('Error updating prerequisite status.');
-              }
-            });
-            div.appendChild(failBtn);
-          }
-          container.appendChild(div);
+          tbody.appendChild(tr);
         });
+        table.appendChild(tbody);
+        container.appendChild(table);
       }
     });
 
-    async function populateUpdateCourseDropdown() {
-      const res = await fetch('/api/student/courses');
-      const courses = await res.json();
-      const courseDropdown = document.getElementById('update-courseName');
-      courseDropdown.innerHTML = '<option value="">Select a registered course</option>';
-      courses.forEach(course => {
-        const option = document.createElement('option');
-        option.value = course._id;
-        option.textContent = course.courseName;
-        courseDropdown.appendChild(option);
-      });
-    }
-
-    document.getElementById('update-timetable-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const courseId = document.getElementById('update-courseName').value;
-      const startTime = document.getElementById('update-startTime').value;
-      const endTime = document.getElementById('update-endTime').value;
-      const day = document.getElementById('update-day').value;
-      if (!courseId || !startTime || !endTime || !day) {
-        alert('All fields are required.');
-        return;
-      }
-      const courses = await fetchStudentCourses();
-      const courseToUpdate = courses.find(c => c._id.toString() === courseId);
-      if (!courseToUpdate) {
-        alert('Course not registered.');
-        return;
-      }
-      const otherCourses = courses.filter(c => c._id.toString() !== courseId);
-      const updatedStart = convertTimeToMinutes(startTime);
-      const updatedEnd = convertTimeToMinutes(endTime);
-      for (const course of otherCourses) {
-        if (course.day === day) {
-          const otherStart = convertTimeToMinutes(course.startTime);
-          const otherEnd = convertTimeToMinutes(course.endTime);
-          if (updatedStart < otherEnd && otherStart < updatedEnd) {
-            alert('Conflict detected with another course. Timetable not updated.');
-            return;
-          }
-        }
-      }
-      const resUpdate = await fetch('/api/student/update-timetable', {
+    async function dropStudent(studentId, courseId) {
+      if (!confirm('Are you sure you want to drop this student from the course?')) return;
+      const res = await fetch('/api/admin/student-course/drop', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ courseId, startTime, endTime, day })
+        body: JSON.stringify({ studentId, courseId })
       });
-      const data = await resUpdate.json();
-      if (resUpdate.ok) {
-        alert(data.message);
-        document.getElementById('update-timetable-form').reset();
-        loadRegistrationSection();
+      if (res.ok) {
+        alert('Student dropped successfully.');
+        document.getElementById('sm-search-btn').click();
       } else {
-        alert(data.message || 'Error updating timetable');
+        alert('Error dropping student from course.');
       }
-    });
+    }
 
-    function convertTimeToMinutes(timeStr) {
-      const [hour, minute] = timeStr.split(':').map(Number);
-      return hour * 60 + minute;
+    async function passPrereq(studentId, courseId) {
+      const resStatus = await fetch('/api/admin/student-course/prerequisites', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ studentId, courseId, status: 'pass' })
+      });
+      if (resStatus.ok) {
+        alert('Prerequisite status set to PASS.');
+        document.getElementById('sm-search-btn').click();
+      } else {
+        alert('Error updating prerequisite status.');
+      }
+    }
+
+    async function failPrereq(studentId, courseId) {
+      const resStatus = await fetch('/api/admin/student-course/prerequisites', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ studentId, courseId, status: 'fail' })
+      });
+      if (resStatus.ok) {
+        alert('Prerequisite status set to FAIL.');
+        document.getElementById('sm-search-btn').click();
+      } else {
+        alert('Error updating prerequisite status.');
+      }
     }
   </script>
 </body>

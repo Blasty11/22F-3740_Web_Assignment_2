@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
   const navLinks = document.querySelectorAll('.nav-link');
-  const sections = document.querySelectorAll('.section');
+  const sections = document.querySelectorAll('section');
 
   navLinks.forEach(link => {
     link.addEventListener('click', (e) => {
@@ -10,12 +10,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const target = link.getAttribute('href').substring(1);
       sections.forEach(section => {
-        section.style.display = (section.id === target) ? 'block' : 'none';
+        section.style.display = section.id === target ? 'block' : 'none';
       });
+
       if (target === 'timetable-section') {
         populateUpdateCourseDropdown();
       }
+      if (target === 'prerequisite-section') {
+        populatePrereqDropdown();
+      }
     });
+  });
+
+  sections.forEach((section, index) => {
+    section.style.display = index === 0 ? 'block' : 'none';
   });
 
   loadRegistrationSection();
@@ -84,7 +92,8 @@ async function loadRegistrationSection() {
           loadRegistrationSection();
           renderCalendar();
         } else {
-          alert('Error registering course');
+          const data = await res.json();
+          alert(data.message || 'Error registering course');
         }
       });
 
@@ -188,11 +197,18 @@ document.getElementById('search-btn').addEventListener('click', async () => {
     resultsDiv.textContent = 'No courses found.';
     return;
   }
+  const table = document.createElement('table');
+  const thead = document.createElement('thead');
+  thead.innerHTML = `<tr><th>Course Name</th><th>Department</th><th>Seats</th></tr>`;
+  table.appendChild(thead);
+  const tbody = document.createElement('tbody');
   filtered.forEach(course => {
-    const div = document.createElement('div');
-    div.textContent = `${course.courseName} - Dept: ${course.department || 'N/A'} - Seats: ${course.seatCount}`;
-    resultsDiv.appendChild(div);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${course.courseName}</td><td>${course.department || 'N/A'}</td><td>${course.seatCount}</td>`;
+    tbody.appendChild(tr);
   });
+  table.appendChild(tbody);
+  resultsDiv.appendChild(table);
 });
 
 const startHour = 8;

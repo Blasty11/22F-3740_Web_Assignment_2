@@ -1,9 +1,16 @@
 const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
-const StudentSchema = new mongoose.Schema({
-  rollNumber: { type: String, required: true, unique: true },
-  username: { type: String, required: true },
-  registeredCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }]
+const prerequisiteStatusSchema = new Schema({
+  courseId: { type: Schema.Types.ObjectId, ref: 'Course' },
+  status: { type: String, default: 'fail' }
 });
 
-module.exports = mongoose.model('Student', StudentSchema);
+const studentSchema = new Schema({
+  username: { type: String },
+  rollNumber: { type: String, required: true, unique: true },
+  registeredCourses: [{ type: Schema.Types.ObjectId, ref: 'Course' }],
+  prerequisitesStatus: [prerequisiteStatusSchema]
+});
+
+module.exports = mongoose.model('Student', studentSchema);

@@ -1,13 +1,16 @@
 const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
-const CourseSchema = new mongoose.Schema({
-  courseName: String,
-  day: String,
-  startTime: String,
-  endTime: String,
-  seatCount: Number,
-  prerequisites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }],
-  department: String
+const courseSchema = new Schema({
+  courseCode: { type: String },
+  courseName: { type: String, required: true },
+  seatCount: { type: Number, default: 0 },
+  department: { type: String, default: '' },
+  prerequisites: [{ type: Schema.Types.ObjectId, ref: 'Course' }],
+  startTime: { type: String, default: '' },
+  endTime: { type: String, default: '' },
+  day: { type: String, default: '' },
+  subscribers: [{ type: Schema.Types.ObjectId, ref: 'Student' }]
 });
 
-module.exports = mongoose.model('Course', CourseSchema);
+module.exports = mongoose.model('Course', courseSchema);

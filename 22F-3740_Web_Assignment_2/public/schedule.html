@@ -7,7 +7,6 @@
 </head>
 <body>
   <header>
-    <br>
     <div class="header-left">
       <h1>Scheduling Nightmare</h1>
       <div id="student-username-display">Logged in as: <span id="student-username"></span></div>
@@ -16,24 +15,27 @@
       <a href="#register-section" class="nav-link active">Register Course</a>
       <a href="#search-section" class="nav-link">Search Courses</a>
       <a href="#timetable-section" class="nav-link">Manage Timetable</a>
+      <a href="#prerequisite-section" class="nav-link">Check Prerequisites</a>
       <a href="/logout" class="logout-button">Logout</a>
     </nav>
   </header>
   
   <main>
-    <section id="register-section" class="section">
+    <section id="register-section" class="section active">
       <h2>Course Registration</h2>
       <div class="registration-container">
         <div id="available-courses">
           <h3>Available Courses</h3>
+
         </div>
         <div id="registered-courses">
           <h3>Registered Courses</h3>
+
         </div>
       </div>
     </section>
     
-    <section id="search-section" class="section" style="display: none;">
+    <section id="search-section" class="section">
       <h2>Search Courses</h2>
       <div class="search-form">
         <input type="text" id="search-query" placeholder="Enter course name or department">
@@ -50,8 +52,8 @@
       <div id="search-results" class="search-results"></div>
     </section>
     
-    
     <section id="timetable-section" class="section" style="display: none;">
+
       <h3>Update Timetable</h3>
       <form id="update-timetable-form">
         <label for="update-courseName">Course Name:</label>
@@ -90,8 +92,20 @@
         <div class="calendar-body" id="calendar-body"></div>
       </div>
     </section>
+    
+    <section id="prerequisite-section" class="section">
+      <h2>Check Prerequisites</h2>
+      <form id="prereq-form">
+        <label for="prereq-course-select">Select Course:</label>
+        <select id="prereq-course-select" required>
+          <option value="">Select a course</option>
+        </select>
+        <button type="submit">Check Prerequisites</button>
+      </form>
+      <div id="prereq-chain-result"></div>
+    </section>
   </main>
-  
+
   <script src="main.js"></script>
 </body>
 </html>
