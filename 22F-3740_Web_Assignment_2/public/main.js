@@ -57,98 +57,142 @@ async function fetchStudentCourses() {
 }
 
 async function loadRegistrationSection() {
-  const allCourses = await fetchCourses();
+  const allCourses        = await fetchCourses();
   const registeredCourses = await fetchStudentCourses();
-  const registeredIds = registeredCourses.map(course => course._id.toString());
+  const registeredIds     = registeredCourses.map(c => c._id.toString());
 
-  const availableCoursesDiv = document.getElementById('available-courses');
-  availableCoursesDiv.innerHTML = '<h3>Available Courses</h3>';
+  // — AVAILABLE —
+  const availableDiv = document.getElementById('available-courses');
+  availableDiv.innerHTML = '<h3>Available Courses</h3>';
+
   allCourses.forEach(course => {
-    if (!registeredIds.includes(course._id.toString())) {
-      const containerDiv = document.createElement('div');
-      containerDiv.style.display = 'flex';
-      containerDiv.style.justifyContent = 'space-between';
-      containerDiv.style.alignItems = 'center';
-      containerDiv.style.margin = '5px 0';
-      containerDiv.style.padding = '8px';
-      containerDiv.style.border = '1px solid #ccc';
-      containerDiv.style.borderRadius = '4px';
+    if (registeredIds.includes(course._id.toString())) return;
 
-      const textSpan = document.createElement('span');
-      textSpan.textContent = `${course.courseName} - Seats: ${course.seatCount} - Dept: ${course.department || 'N/A'}`;
+    const container = document.createElement('div');
+    Object.assign(container.style, {
+      display: 'flex', justifyContent: 'space-between',
+      alignItems: 'center', margin: '5px 0',
+      padding: '8px', border: '1px solid #ccc',
+      borderRadius: '4px'
+    });
 
-      const registerBtn = document.createElement('button');
-      registerBtn.textContent = 'Register Course';
-      registerBtn.style.marginLeft = '10px';
-      registerBtn.addEventListener('click', async () => {
+    const info = document.createElement('span');
+    info.textContent = `${course.courseName} - Seats: ${course.seatCount} - Dept: ${course.department || 'N/A'}`;
+
+    const btn = document.createElement('button');
+    btn.textContent = 'Register Course';
+    btn.style.marginLeft = '10px';
+
+    btn.addEventListener('click', async () => {
+      // 1) fetch prereq chain
+      let chain = [];
+      try {
+        const prRes = await fetch(`/api/course-prerequisite-chain?courseId=${course._id}`, { credentials: 'include' });
+        chain = (await prRes.json()).chain || [];
+      } catch (err) {
+        alert('Could not verify prerequisites. Try again later.');
+        return;
+      }
+
+      if (chain.length > 0) {
+        alert('This course has prerequisites.');
+        const passed = confirm('Have you already passed all prerequisites? OK = Yes, Cancel = No.');
+
+        if (!passed) {
+          // auto‑register all prereqs
+          for (let prereq of chain) {
+            if (registeredIds.includes(prereq._id.toString())) continue;
+            const r = await fetch('/api/register-course', {
+              method: 'POST', credentials: 'include',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ courseId: prereq._id })
+            });
+            if (!r.ok) {
+              const d = await r.json().catch(() => ({}));
+              alert(`Failed to auto-register ${prereq.courseName}: ${d.message}`);
+              return;
+            }
+          }
+          alert('Prerequisites auto-registered. Complete them first, then register this course.');
+          return;
+        }
+
+        // 2) record Pass status *for each* prereq course
+        for (let prereq of chain) {
+          await fetch('/api/student/prerequisite-status', {
+            method: 'POST', credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ courseId: prereq._id, status: 'Pass' })
+          });
+        }
+      }
+
+      // 3) now register the original course
+      try {
         const res = await fetch('/api/register-course', {
-          method: 'POST',
-          credentials: 'include',
+          method: 'POST', credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ courseId: course._id })
         });
-        if (res.ok) {
-          alert('Course registered successfully!');
-          loadRegistrationSection();
-          renderCalendar();
-        } else {
-          const data = await res.json();
-          alert(data.message || 'Error registering course');
-        }
-      });
+        const data = await res.json();
+        alert(data.message);
+        loadRegistrationSection();
+        renderCalendar();
+      } catch {
+        alert('Network error. Try again.');
+      }
+    });
 
-      containerDiv.appendChild(textSpan);
-      containerDiv.appendChild(registerBtn);
-      availableCoursesDiv.appendChild(containerDiv);
-    }
+    container.appendChild(info);
+    container.appendChild(btn);
+    availableDiv.appendChild(container);
   });
 
-  const registeredCoursesDiv = document.getElementById('registered-courses');
-  registeredCoursesDiv.innerHTML = '<h3>Registered Courses</h3>';
-  if (registeredCourses.length === 0) {
-    registeredCoursesDiv.innerHTML += '<p>No courses registered.</p>';
+  // — REGISTERED (unchanged) —
+  const regDiv = document.getElementById('registered-courses');
+  regDiv.innerHTML = '<h3>Registered Courses</h3>';
+  if (!registeredCourses.length) {
+    regDiv.innerHTML += '<p>No courses registered.</p>';
   } else {
     registeredCourses.forEach(course => {
-      const containerDiv = document.createElement('div');
-      containerDiv.style.display = 'flex';
-      containerDiv.style.justifyContent = 'space-between';
-      containerDiv.style.alignItems = 'center';
-      containerDiv.style.margin = '5px 0';
-      containerDiv.style.padding = '8px';
-      containerDiv.style.border = '1px solid #ccc';
-      containerDiv.style.borderRadius = '4px';
-      containerDiv.style.backgroundColor = 'lightgreen';
+      const c = document.createElement('div');
+      Object.assign(c.style, {
+        display: 'flex', justifyContent: 'space-between',
+        alignItems: 'center', margin: '5px 0',
+        padding: '8px', border: '1px solid #ccc',
+        borderRadius: '4px', backgroundColor: 'lightgreen'
+      });
 
-      const textSpan = document.createElement('span');
-      textSpan.textContent = `${course.courseName} - Seats: ${course.seatCount} - Dept: ${course.department || 'N/A'}`;
+      const info = document.createElement('span');
+      info.textContent = `${course.courseName} - Seats: ${course.seatCount}`;
 
       const dropBtn = document.createElement('button');
       dropBtn.textContent = 'Drop Course';
       dropBtn.style.marginLeft = '10px';
       dropBtn.addEventListener('click', async () => {
-        if (confirm('Are you sure you want to drop this course?')) {
-          const res = await fetch('/api/unregister-course', {
-            method: 'DELETE',
-            credentials: 'include',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ courseId: course._id })
-          });
-          if (res.ok) {
-            alert('Course dropped successfully!');
-            loadRegistrationSection();
-            renderCalendar();
-          } else {
-            alert('Error dropping course');
-          }
+        if (!confirm('Drop this course?')) return;
+        const res = await fetch('/api/unregister-course', {
+          method: 'DELETE', credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ courseId: course._id })
+        });
+        if (res.ok) {
+          alert('Course dropped.');
+          loadRegistrationSection();
+          renderCalendar();
+        } else {
+          alert('Error dropping course.');
         }
       });
 
-      containerDiv.appendChild(textSpan);
-      containerDiv.appendChild(dropBtn);
-      registeredCoursesDiv.appendChild(containerDiv);
+      c.appendChild(info);
+      c.appendChild(dropBtn);
+      regDiv.appendChild(c);
     });
   }
 }
+
+
 
 async function populateDepartmentDropdown() {
   try {
@@ -372,3 +416,64 @@ document.getElementById('update-timetable-form').addEventListener('submit', asyn
     alert(data.message || 'Error updating timetable');
   }
 });
+
+async function populatePrereqDropdown() {
+  const select = document.getElementById('prereq-course-select');
+  const chainList = document.getElementById('prereq-chain-result');
+
+  // 1) reset dropdown & list
+  select.innerHTML = '<option value="">-- Select a course --</option>';
+  chainList.innerHTML = '';
+
+  // 2) fill dropdown with all courses
+  try {
+    const courses = await fetchCourses();
+    courses.forEach(course => {
+      const opt = document.createElement('option');
+      opt.value = course._id;
+      opt.textContent = `${course.courseName} (${course.courseCode})`;
+      select.appendChild(opt);
+    });
+  } catch (err) {
+    console.error('Error loading courses for prereq dropdown:', err);
+    chainList.innerHTML = '<li>Error loading courses.</li>';
+    return;
+  }
+
+  // 3) when user picks a course, fetch & display its prereq chain
+  select.addEventListener('change', async () => {
+    const courseId = select.value;
+    chainList.innerHTML = '';
+
+    if (!courseId) {
+      // nothing selected
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        `/api/course-prerequisite-chain?courseId=${encodeURIComponent(courseId)}`,
+        { credentials: 'include' }
+      );
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || 'Failed to fetch chain');
+      }
+
+      const chain = data.chain;
+      if (chain.length === 0) {
+        chainList.innerHTML = '<li>No prerequisites for this course.</li>';
+      } else {
+        chain.forEach(pr => {
+          const li = document.createElement('li');
+          li.textContent = `${pr.courseName} (${pr.courseCode})`;
+          chainList.appendChild(li);
+        });
+      }
+    } catch (err) {
+      console.error('Error fetching prerequisite chain:', err);
+      chainList.innerHTML = `<li>Error: ${err.message}</li>`;
+    }
+  });
+}

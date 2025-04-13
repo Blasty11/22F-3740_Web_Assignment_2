@@ -49,23 +49,56 @@ exports.getStudentCoursesForAdmin = async (req, res) => {
 exports.deleteStudentCourseForAdmin = async (req, res) => {
   try {
     const { studentId, courseId } = req.body;
-    const course = await Course.findById(courseId);
-    if (!course) return res.status(404).json({ message: 'Course not found' });
-    course.seatCount += 1;
-    course.startTime = "";
-    course.endTime = "";
-    course.day = "";
-    await course.save();
-    const student = await Student.findById(studentId);
-    if (!student) return res.status(404).json({ message: 'Student not found' });
-    student.registeredCourses = student.registeredCourses.filter(id => id.toString() !== courseId);
-    if (student.prerequisitesStatus) {
-      student.prerequisitesStatus = student.prerequisitesStatus.filter(ps => ps.courseId.toString() !== courseId);
+    if (!studentId || !courseId) {
+      return res.status(400).json({ message: 'studentId and courseId are required' });
     }
+
+    // 1) Find the course
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+
+    // 2) Increment seatCount
+    course.seatCount += 1;
+
+    // 3) If course now has open seats, clear its schedule fields
+    if (course.seatCount > 0) {
+      course.startTime = '';
+      course.endTime   = '';
+      course.day       = '';
+    }
+
+    await course.save();
+
+    // 4) Find the student
+    const student = await Student.findById(studentId);
+    if (!student) {
+      return res.status(404).json({ message: 'Student not found' });
+    }
+
+    // 5) Remove the course from their registeredCourses
+    student.registeredCourses = student.registeredCourses
+      .filter(id => id.toString() !== courseId);
+
+    // 6) Also remove any prereq status entries for that course
+    if (Array.isArray(student.prerequisitesStatus)) {
+      student.prerequisitesStatus = student.prerequisitesStatus
+        .filter(ps => ps.courseId.toString() !== courseId);
+    }
+
     await student.save();
-    res.status(200).json({ message: 'Student dropped from course successfully' });
+
+    // 7) Success
+    return res
+      .status(200)
+      .json({ message: 'Student dropped from course successfully' });
+
   } catch (err) {
-    res.status(500).send(err);
+    console.error('deleteStudentCourseForAdmin error:', err);
+    return res
+      .status(500)
+      .json({ message: 'Internal server error' });
   }
 };
 

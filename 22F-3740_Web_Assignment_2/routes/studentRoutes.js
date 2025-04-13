@@ -11,6 +11,8 @@ router.get('/schedule', isStudentAuthenticated, studentController.getSchedulePag
 router.get('/api/student/profile', isStudentAuthenticated, studentController.getStudentProfile);
 router.get('/api/courses', isStudentAuthenticated, studentController.getAllCourses);
 router.post('/api/register-course', isStudentAuthenticated, studentController.postRegisterCourse);
+router.post('/api/student/prerequisite-status', isStudentAuthenticated, studentController.postPrerequisiteStatus
+);
 router.post('/api/courses', isStudentAuthenticated, studentController.postCreateCourse);
 router.delete('/api/courses/:id', isStudentAuthenticated, studentController.deleteCourse);
 router.get('/api/student/courses', isStudentAuthenticated, studentController.getStudentCourses);

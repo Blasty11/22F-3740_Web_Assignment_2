@@ -51,31 +51,110 @@ exports.getAllCourses = async (req, res) => {
 
 exports.postRegisterCourse = async (req, res) => {
   try {
+    const studentId = req.session.student._id;
     const { courseId } = req.body;
-    const course = await Course.findById(courseId);
-    if (!course) return res.status(404).json({ message: 'Course not found' });
+    if (!courseId) return res.status(400).json({ message: 'courseId is required' });
 
-    if (course.prerequisites && course.prerequisites.length > 0) {
-      return res.status(400).json({ message: 'This course has prerequisites. Please complete them before registering.' });
-    }
+    const [course, student] = await Promise.all([
+      Course.findById(courseId),
+      Student.findById(studentId),
+    ]);
 
-    const student = await Student.findById(req.session.student._id);
+    if (!course)  return res.status(404).json({ message: 'Course not found' });
     if (!student) return res.status(404).json({ message: 'Student not found' });
 
+    // Already registered?
     if (student.registeredCourses.includes(courseId)) {
       return res.status(200).json({ message: 'Course already registered', course });
     }
+
+    // Check for prerequisites chain
+    // assume Course model has .prerequisites: [ObjectId]
+    const prereqs = course.prerequisites || [];
+
+    // find any prereq IDs for which student has a "Pass" status
+    const passedPrereqs = student.prerequisitesStatus
+      .filter(ps => ps.status === 'Pass')
+      .map(ps => ps.courseId.toString());
+
+    // if some prereqs passed, but not registered, we treat them as passed
+    // and we will unregister them if registered
+    const toUnregister = prereqs.filter(prId => passedPrereqs.includes(prId.toString()));
+
+    // ensure all other prereqs are either registered or passed
+    const unmet = prereqs.filter(prId => {
+      const sId = prId.toString();
+      return !passedPrereqs.includes(sId) && !student.registeredCourses.map(String).includes(sId);
+    });
+    if (unmet.length > 0) {
+      return res.status(400).json({ message: 'You must complete prerequisites first.' });
+    }
+
+    // Seats available?
     if (course.seatCount <= 0) {
       return res.status(400).json({ message: 'No seats available. Consider subscribing for notifications.' });
     }
+
+    // Deduct seat, save
     course.seatCount -= 1;
     await course.save();
 
+    // Unregister passed prereqs (give back their seats)
+    for (let prId of toUnregister) {
+      const prCourse = await Course.findById(prId);
+      if (prCourse) {
+        prCourse.seatCount += 1;
+        await prCourse.save();
+      }
+      // remove from student's registeredCourses
+      student.registeredCourses = student.registeredCourses.filter(id => id.toString() !== prId.toString());
+    }
+
+    // Add new course
     student.registeredCourses.push(courseId);
     await student.save();
-    res.status(200).json({ message: 'Course registered successfully', course });
+
+    const leveledUp = toUnregister.length > 0;
+    const message = leveledUp
+      ? `Prerequisite(s) completed and unregistered. You’ve leveled up to ${course.courseName}!`
+      : 'Course registered successfully';
+
+    return res.status(200).json({ message, course });
+
   } catch (err) {
-    res.status(500).send(err);
+    console.error('postRegisterCourse error:', err);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+
+/**
+ * Record a pass/fail status for a course’s prerequisites check.
+ */
+exports.postPrerequisiteStatus = async (req, res) => {
+  try {
+    const studentId = req.session.student._id;
+    const { courseId, status } = req.body;
+    if (!courseId || !['Pass','Fail'].includes(status)) {
+      return res.status(400).json({ message: 'Invalid courseId or status' });
+    }
+
+    const student = await Student.findById(studentId);
+    if (!student) return res.status(404).json({ message: 'Student not found' });
+
+    student.prerequisitesStatus = student.prerequisitesStatus || [];
+    const existing = student.prerequisitesStatus.find(ps => ps.courseId.toString() === courseId);
+    if (existing) {
+      existing.status = status;
+    } else {
+      student.prerequisitesStatus.push({ courseId, status });
+    }
+    await student.save();
+
+    return res.status(200).json({ message: 'Prerequisite status updated' });
+  } catch (err) {
+    console.error('postPrerequisiteStatus error:', err);
+    return res.status(500).json({ message: 'Internal server error' });
   }
 };
 
